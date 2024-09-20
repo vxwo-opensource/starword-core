@@ -1,6 +1,5 @@
 #include "star_json.h"
 
-const skchar_t kSTAR = '*';
 const skchar_t kBLANK = ' ';
 const skchar_t kCOLON = ':';
 const skchar_t kCOMMA = ',';
@@ -60,7 +59,7 @@ StarJson::~StarJson() {}
 
 bool StarJson::IsEmpty() const { return tree_.IsEmpty(); };
 
-void StarJson::AddPrefix(const skchar_t* buffer, size_t length) {
+void StarJson::AddKeyword(const skchar_t* buffer, size_t length) {
   tree_.AddWord(kDOUBLE_QUOTE, buffer, length, 0);
 }
 

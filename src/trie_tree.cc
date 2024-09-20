@@ -42,6 +42,8 @@ TrieTree::~TrieTree() {
       clear_stack.push(it->second);
     }
     node->children.clear();
+
+    clear_stack.pop();
     delete node;
   }
 }

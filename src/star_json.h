@@ -15,7 +15,7 @@ class StarJson final {
 
   bool IsEmpty() const;
 
-  void AddPrefix(const skchar_t* buffer, size_t length);
+  void AddKeyword(const skchar_t* buffer, size_t length);
   bool ProcessBuffer(skchar_t* buffer, size_t length);
 
  private:
