@@ -1,4 +1,4 @@
-#include "jwbase.h"
+#include "sjc_base.h"
 
 #ifndef NDEBUG
 

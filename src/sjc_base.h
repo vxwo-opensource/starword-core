@@ -1,7 +1,7 @@
-#ifndef JWBASE_H_
-#define JWBASE_H_
+#ifndef SJC_BASE_H_
+#define SJC_BASE_H_
 
-#include <cstdint>
+#include <uchar.h>
 
 #if defined(_MSC_VER)
 #include <BaseTsd.h>
@@ -9,9 +9,6 @@ typedef SSIZE_T ssize_t;
 #else
 #include <sys/types.h>
 #endif
-
-typedef uint16_t JWChar;
-typedef JWChar *JWCharBuffer;
 
 #ifdef NDEBUG
 #define DebugOutput(...)

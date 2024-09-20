@@ -1,17 +1,15 @@
 #include "star_json.h"
 
-#include "jwbase.h"
+const char16_t kSTAR = '*';
+const char16_t kBLANK = ' ';
+const char16_t kCOLON = ':';
+const char16_t kCOMMA = ',';
+const char16_t kBACKSLASH = '\\';
+const char16_t kDOUBLE_QUOTE = '\"';
+const char16_t kLEFT_BRACE = '{';
+const char16_t kLEFT_BRACKET = '[';
 
-const JWChar kSTAR = '*';
-const JWChar kBLANK = ' ';
-const JWChar kCOLON = ':';
-const JWChar kCOMMA = ',';
-const JWChar kBACKSLASH = '\\';
-const JWChar kDOUBLE_QUOTE = '\"';
-const JWChar kLEFT_BRACE = '{';
-const JWChar kLEFT_BRACKET = '[';
-
-static size_t BufferSkipChar(const JWCharBuffer buffer, JWChar ch,
+static size_t BufferSkipChar(const char16_t* buffer, char16_t ch,
                              size_t start_index, size_t end_index) {
   size_t index = start_index;
   while (index < end_index && buffer[index] == ch) {
@@ -20,7 +18,7 @@ static size_t BufferSkipChar(const JWCharBuffer buffer, JWChar ch,
   return index - start_index;
 }
 
-static size_t BufferForwardSkipChar(const JWCharBuffer buffer, JWChar ch,
+static size_t BufferForwardSkipChar(const char16_t* buffer, char16_t ch,
                                     size_t start_index, size_t end_index) {
   size_t index = end_index;
   while (index >= start_index && buffer[index] == ch) {
@@ -29,10 +27,10 @@ static size_t BufferForwardSkipChar(const JWCharBuffer buffer, JWChar ch,
   return end_index - index;
 }
 
-static ssize_t BufferIndexOfStr(const JWCharBuffer buffer, size_t start_index,
-                                size_t end_index, const JWCharBuffer str,
+static ssize_t BufferIndexOfStr(const char16_t* buffer, size_t start_index,
+                                size_t end_index, const char16_t* str,
                                 size_t str_start_index, size_t str_end_index) {
-  JWChar first_char = str[str_start_index];
+  char16_t first_char = str[str_start_index];
   size_t str_count = str_end_index - str_start_index;
 
   size_t stop_index = end_index - str_count;
@@ -60,11 +58,13 @@ StarJson::StarJson(bool skip_number, size_t border)
 
 StarJson::~StarJson() {}
 
-void StarJson::AddPrefix(const JWCharBuffer buffer, size_t length) {
+bool StarJson::IsEmpty() const { return tree_.IsEmpty(); };
+
+void StarJson::AddPrefix(const char16_t* buffer, size_t length) {
   tree_.AddWord(kDOUBLE_QUOTE, buffer, length, 0);
 }
 
-bool StarJson::ProcessBuffer(JWCharBuffer buffer, size_t length) {
+bool StarJson::ProcessBuffer(char16_t* buffer, size_t length) {
   StarContext context{0, 0};
 
   size_t index = 0;
@@ -112,7 +112,7 @@ bool StarJson::ProcessBuffer(JWCharBuffer buffer, size_t length) {
   return context.count > 0;
 }
 
-size_t StarJson::ProcessComplexValue(StarContext &context, JWCharBuffer buffer,
+size_t StarJson::ProcessComplexValue(StarContext& context, char16_t* buffer,
                                      size_t start_index, size_t end_index,
                                      bool enter_array) {
   // Skip blank
@@ -129,7 +129,7 @@ size_t StarJson::ProcessComplexValue(StarContext &context, JWCharBuffer buffer,
     return symbol_end_index;
   }
 
-  JWChar first_char = buffer[prefix_begin_index];
+  char16_t first_char = buffer[prefix_begin_index];
 
   // Test value is object
   if (first_char == kLEFT_BRACE) {
@@ -157,7 +157,7 @@ size_t StarJson::ProcessComplexValue(StarContext &context, JWCharBuffer buffer,
       index = next_end_index + 1;
 
       // Find the symbol comma
-      JWChar stop_char = buffer[next_end_index];
+      char16_t stop_char = buffer[next_end_index];
       if (stop_char != kCOMMA) {
         break;
       }
@@ -166,7 +166,7 @@ size_t StarJson::ProcessComplexValue(StarContext &context, JWCharBuffer buffer,
   }
 }
 
-size_t StarJson::ProcessSimpleValue(StarContext &context, JWCharBuffer buffer,
+size_t StarJson::ProcessSimpleValue(StarContext& context, char16_t* buffer,
                                     size_t start_index, size_t end_index) {
   // Find the number
   ssize_t number_end_index = FindNumberEnd(buffer, start_index, end_index);
@@ -217,7 +217,7 @@ size_t StarJson::ProcessSimpleValue(StarContext &context, JWCharBuffer buffer,
   return suffix_begin_index + prefix_length;
 }
 
-void StarJson::StarBuffer(StarContext &context, JWCharBuffer buffer,
+void StarJson::StarBuffer(StarContext& context, char16_t* buffer,
                           size_t start_index, size_t end_index,
                           bool is_number) {
   if (skip_number_ && is_number) {
@@ -269,11 +269,11 @@ void StarJson::StarBuffer(StarContext &context, JWCharBuffer buffer,
   }
 }
 
-ssize_t StarJson::FindKeyEnd(const JWCharBuffer buffer, size_t start_index,
+ssize_t StarJson::FindKeyEnd(const char16_t* buffer, size_t start_index,
                              size_t end_index) {
   ssize_t index = -1;
   for (size_t i = start_index; i < end_index; ++i) {
-    JWChar ch = buffer[i];
+    char16_t ch = buffer[i];
     if (ch == kBACKSLASH || ch == kDOUBLE_QUOTE) {
       index = i;
       break;
@@ -282,8 +282,8 @@ ssize_t StarJson::FindKeyEnd(const JWCharBuffer buffer, size_t start_index,
   return index;
 }
 
-ssize_t StarJson::FindSoftCharEnd(const JWCharBuffer buffer, JWChar skip,
-                                  JWChar target, size_t start_index,
+ssize_t StarJson::FindSoftCharEnd(const char16_t* buffer, char16_t skip,
+                                  char16_t target, size_t start_index,
                                   size_t end_index) {
   size_t index =
       start_index + BufferSkipChar(buffer, skip, start_index, end_index);
@@ -293,14 +293,14 @@ ssize_t StarJson::FindSoftCharEnd(const JWCharBuffer buffer, JWChar skip,
   return index + 1;
 }
 
-ssize_t StarJson::FindSymbolEnd(const JWCharBuffer buffer, size_t start_index,
+ssize_t StarJson::FindSymbolEnd(const char16_t* buffer, size_t start_index,
                                 size_t end_index) {
   size_t size = end_index - start_index;
   if (size < 4) {
     return -1;
   }
 
-  JWChar first_char = buffer[start_index];
+  char16_t first_char = buffer[start_index];
 
   if (first_char == 'n') {  // Test the symbol null
     if (buffer[start_index + 1] == 'u' && buffer[start_index + 2] == 'l' &&
@@ -322,11 +322,11 @@ ssize_t StarJson::FindSymbolEnd(const JWCharBuffer buffer, size_t start_index,
   return -1;
 }
 
-ssize_t StarJson::FindNumberEnd(const JWCharBuffer buffer, size_t start_index,
+ssize_t StarJson::FindNumberEnd(const char16_t* buffer, size_t start_index,
                                 size_t end_index) {
   size_t index = start_index;
   while (index < end_index) {
-    JWChar ch = buffer[index];
+    char16_t ch = buffer[index];
     if (!((ch >= '0' && ch <= '9') || ch == '.' || ch == '-' || ch == '+' ||
           ch == 'e' || ch == 'E')) {
       break;

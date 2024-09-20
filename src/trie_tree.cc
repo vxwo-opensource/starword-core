@@ -4,16 +4,14 @@
 #include <unordered_map>
 #include <vector>
 
-#include "jwbase.h"
-
 typedef struct TrieTree::TrieNode {
   bool is_word;
   int value;
   size_t length;
-  std::unordered_map<JWChar, struct TrieNode *> children;
+  std::unordered_map<char16_t, struct TrieNode *> children;
 } TrieNode;
 
-static TrieNode *DigTrieNode(TrieNode *current, JWChar ch) {
+static TrieNode *DigTrieNode(TrieNode *current, char16_t ch) {
   auto it = current->children.find(ch);
   if (it != current->children.end()) {
     current = it->second;
@@ -50,8 +48,8 @@ TrieTree::~TrieTree() {
 
 bool TrieTree::IsEmpty() const { return root_->children.empty(); }
 
-void TrieTree::InsertWord(TrieNode *node, const JWCharBuffer buffer,
-                          size_t length, int value, size_t base_length) {
+void TrieTree::InsertWord(TrieNode *node, const char16_t *buffer, size_t length,
+                          int value, size_t base_length) {
   TrieNode *current = node;
   for (size_t i = 0; i < length; ++i) {
     current = DigTrieNode(current, buffer[i]);
@@ -64,16 +62,16 @@ void TrieTree::InsertWord(TrieNode *node, const JWCharBuffer buffer,
   }
 }
 
-void TrieTree::AddWord(const JWCharBuffer buffer, size_t length, int value) {
+void TrieTree::AddWord(const char16_t *buffer, size_t length, int value) {
   InsertWord(root_, buffer, length, value, 0);
 }
 
-void TrieTree::AddWord(JWChar prefix, const JWCharBuffer buffer, size_t length,
+void TrieTree::AddWord(char16_t prefix, const char16_t *buffer, size_t length,
                        int value) {
   InsertWord(DigTrieNode(root_, prefix), buffer, length, value, 1);
 }
 
-TrieNode *TrieTree::FindWord(const JWCharBuffer buffer, size_t start_index,
+TrieNode *TrieTree::FindWord(const char16_t *buffer, size_t start_index,
                              size_t end_index) const {
   TrieNode *current = root_;
   std::vector<TrieNode *> cached;
@@ -93,7 +91,7 @@ TrieNode *TrieTree::FindWord(const JWCharBuffer buffer, size_t start_index,
   return cached.empty() ? nullptr : cached.back();
 }
 
-bool TrieTree::SearchWord(TrieFound &found, const JWCharBuffer buffer,
+bool TrieTree::SearchWord(TrieFound &found, const char16_t *buffer,
                           size_t start_index, size_t end_index) const {
   for (size_t i = start_index; i < end_index; ++i) {
     TrieNode *node = FindWord(buffer, i, end_index);
