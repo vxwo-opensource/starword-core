@@ -15,32 +15,32 @@ class StarJson final {
 
   bool IsEmpty() const;
 
-  void AddPrefix(const sjchar_t* buffer, size_t length);
-  bool ProcessBuffer(sjchar_t* buffer, size_t length);
+  void AddPrefix(const skchar_t* buffer, size_t length);
+  bool ProcessBuffer(skchar_t* buffer, size_t length);
 
  private:
   bool skip_number_;
   size_t border_;
   TrieTree tree_;
 
-  size_t ProcessComplexValue(StarContext& context, sjchar_t* buffer,
+  size_t ProcessComplexValue(StarContext& context, skchar_t* buffer,
                              size_t start_index, size_t end_index,
                              bool enter_array);
-  size_t ProcessSimpleValue(StarContext& context, sjchar_t* buffer,
+  size_t ProcessSimpleValue(StarContext& context, skchar_t* buffer,
                             size_t start_index, size_t end_index);
 
-  void StarBuffer(StarContext& context, sjchar_t* buffer, size_t start_index,
+  void StarBuffer(StarContext& context, skchar_t* buffer, size_t start_index,
                   size_t end_index, bool is_number);
 
-  static ssize_t FindKeyEnd(const sjchar_t* buffer, size_t start_index,
+  static ssize_t FindKeyEnd(const skchar_t* buffer, size_t start_index,
                             size_t eend_index);
-  static ssize_t FindSoftCharEnd(const sjchar_t* buffer, sjchar_t skip,
-                                 sjchar_t target, size_t start_index,
+  static ssize_t FindSoftCharEnd(const skchar_t* buffer, skchar_t skip,
+                                 skchar_t target, size_t start_index,
                                  size_t end_index);
-  static ssize_t FindSymbolEnd(const sjchar_t* buffer, size_t start_index,
+  static ssize_t FindSymbolEnd(const skchar_t* buffer, size_t start_index,
                                size_t end_index);
 
-  static ssize_t FindNumberEnd(const sjchar_t* buffer, size_t start_index,
+  static ssize_t FindNumberEnd(const skchar_t* buffer, size_t start_index,
                                size_t end_index);
 };
 

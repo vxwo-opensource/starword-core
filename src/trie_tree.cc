@@ -8,10 +8,10 @@ typedef struct TrieTree::TrieNode {
   bool is_word;
   int value;
   size_t length;
-  std::unordered_map<sjchar_t, struct TrieNode *> children;
+  std::unordered_map<skchar_t, struct TrieNode *> children;
 } TrieNode;
 
-static TrieNode *DigTrieNode(TrieNode *current, sjchar_t ch) {
+static TrieNode *DigTrieNode(TrieNode *current, skchar_t ch) {
   auto it = current->children.find(ch);
   if (it != current->children.end()) {
     current = it->second;
@@ -48,7 +48,7 @@ TrieTree::~TrieTree() {
 
 bool TrieTree::IsEmpty() const { return root_->children.empty(); }
 
-void TrieTree::InsertWord(TrieNode *node, const sjchar_t *buffer, size_t length,
+void TrieTree::InsertWord(TrieNode *node, const skchar_t *buffer, size_t length,
                           int value, size_t base_length) {
   TrieNode *current = node;
   for (size_t i = 0; i < length; ++i) {
@@ -62,16 +62,16 @@ void TrieTree::InsertWord(TrieNode *node, const sjchar_t *buffer, size_t length,
   }
 }
 
-void TrieTree::AddWord(const sjchar_t *buffer, size_t length, int value) {
+void TrieTree::AddWord(const skchar_t *buffer, size_t length, int value) {
   InsertWord(root_, buffer, length, value, 0);
 }
 
-void TrieTree::AddWord(sjchar_t prefix, const sjchar_t *buffer, size_t length,
+void TrieTree::AddWord(skchar_t prefix, const skchar_t *buffer, size_t length,
                        int value) {
   InsertWord(DigTrieNode(root_, prefix), buffer, length, value, 1);
 }
 
-TrieNode *TrieTree::FindWord(const sjchar_t *buffer, size_t start_index,
+TrieNode *TrieTree::FindWord(const skchar_t *buffer, size_t start_index,
                              size_t end_index) const {
   TrieNode *current = root_;
   std::vector<TrieNode *> cached;
@@ -91,7 +91,7 @@ TrieNode *TrieTree::FindWord(const sjchar_t *buffer, size_t start_index,
   return cached.empty() ? nullptr : cached.back();
 }
 
-bool TrieTree::SearchWord(TrieFound &found, const sjchar_t *buffer,
+bool TrieTree::SearchWord(TrieFound &found, const skchar_t *buffer,
                           size_t start_index, size_t end_index) const {
   for (size_t i = start_index; i < end_index; ++i) {
     TrieNode *node = FindWord(buffer, i, end_index);

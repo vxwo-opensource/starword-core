@@ -1,4 +1,4 @@
-#include "sjc_base.h"
+#include "skc_base.h"
 
 #ifndef NDEBUG
 
@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 void DebugOutput(const char *format, ...) {
-  FILE *fp = fopen("debug-output.log", "a+");
+  FILE *fp = fopen("debug.log", "a+");
   if (fp != nullptr) {
     va_list args;
     va_start(args, format);
