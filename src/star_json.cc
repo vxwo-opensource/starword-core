@@ -1,5 +1,7 @@
 #include "star_json.h"
 
+#include "star_base.h"
+
 const skchar_t kBLANK = ' ';
 const skchar_t kCOLON = ':';
 const skchar_t kCOMMA = ',';
@@ -52,12 +54,8 @@ static ssize_t BufferIndexOfStr(const skchar_t* buffer, size_t start_index,
   return -1;
 }
 
-StarJson::StarJson(bool skip_number, size_t border)
-    : skip_number_(skip_number), border_(border) {}
-
-StarJson::~StarJson() {}
-
-bool StarJson::IsEmpty() const { return tree_.IsEmpty(); };
+StarJson::StarJson(bool ignore_case, bool skip_number, size_t border)
+    : StarBase(ignore_case), skip_number_(skip_number), border_(border) {}
 
 void StarJson::AddKeyword(const skchar_t* buffer, size_t length) {
   tree_.AddWord(kDOUBLE_QUOTE, buffer, length);

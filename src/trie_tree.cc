@@ -4,11 +4,16 @@
 #include <unordered_map>
 #include <vector>
 
-typedef struct TrieTree::TrieNode {
+static inline skchar_t transform(bool ignore, skchar_t value) {
+  return !ignore ? value
+                 : ((value >= 'A' && value <= 'Z') ? (value + 0x20) : value);
+}
+
+struct TrieNode {
   bool is_word;
   size_t length;
   std::unordered_map<skchar_t, struct TrieNode *> children;
-} TrieNode;
+};
 
 static TrieNode *DigTrieNode(TrieNode *current, skchar_t ch) {
   auto it = current->children.find(ch);
@@ -24,7 +29,8 @@ static TrieNode *DigTrieNode(TrieNode *current, skchar_t ch) {
   return current;
 }
 
-TrieTree::TrieTree() : root_(new TrieNode()) {}
+TrieTree::TrieTree(bool ignore_case)
+    : root_(new TrieNode()), ignore_case_(ignore_case) {}
 
 TrieTree::~TrieTree() {
   std::stack<TrieNode *> clear_stack;
@@ -53,7 +59,7 @@ void TrieTree::InsertWord(TrieNode *node, const skchar_t *buffer, size_t length,
                           size_t extra_length) {
   TrieNode *current = node;
   for (size_t i = 0; i < length; ++i) {
-    current = DigTrieNode(current, buffer[i]);
+    current = DigTrieNode(current, transform(ignore_case_, buffer[i]));
   }
 
   if (!current->is_word) {
@@ -76,7 +82,7 @@ TrieNode *TrieTree::FindWord(const skchar_t *buffer, size_t start_index,
   std::vector<TrieNode *> cached;
 
   for (size_t i = start_index; i < end_index; i++) {
-    auto child = current->children.find(buffer[i]);
+    auto child = current->children.find(transform(ignore_case_, buffer[i]));
     if (child == current->children.end()) {
       break;
     }

@@ -3,16 +3,15 @@
 
 #include "skc_base.h"
 
-typedef struct TrieFound {
+struct TrieFound {
   size_t start_index;
   size_t stop_index;
-} TrieIndex;
+};
 
+struct TrieNode;
 class TrieTree final {
-  struct TrieNode;
-
  public:
-  TrieTree();
+  TrieTree(bool ignore_case);
   ~TrieTree();
 
   bool IsEmpty() const;
@@ -25,6 +24,7 @@ class TrieTree final {
 
  private:
   TrieNode* root_;
+  bool ignore_case_;
 
   void InsertWord(TrieNode* node, const skchar_t* buffer, size_t length,
                   size_t extra_length);

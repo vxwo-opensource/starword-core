@@ -1,14 +1,7 @@
 #include "star_text.h"
 
-StarText::StarText(size_t border) : border_(border) {}
-
-StarText::~StarText() {}
-
-bool StarText::IsEmpty() const { return tree_.IsEmpty(); };
-
-void StarText::AddKeyword(const skchar_t* buffer, size_t length) {
-  tree_.AddWord(buffer, length);
-}
+StarText::StarText(bool ignore_case, size_t border)
+    : StarBase(ignore_case), border_(border) {}
 
 bool StarText::ProcessBuffer(skchar_t* buffer, size_t length) {
   size_t index = 0;

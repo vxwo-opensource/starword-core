@@ -1,19 +1,11 @@
 #ifndef SJC_STAR_JSON_H_
 #define SJC_STAR_JSON_H_
 
-#include "trie_tree.h"
+#include "star_base.h"
 
-class StarJson final {
-  typedef struct StarContext {
-    size_t count;
-    size_t char_length;
-  } StarContext;
-
+class StarJson : public StarBase {
  public:
-  StarJson(bool skip_number, size_t border);
-  ~StarJson();
-
-  bool IsEmpty() const;
+  StarJson(bool ignore_case, bool skip_number, size_t border);
 
   void AddKeyword(const skchar_t* buffer, size_t length);
   bool ProcessBuffer(skchar_t* buffer, size_t length);
@@ -21,7 +13,6 @@ class StarJson final {
  private:
   bool skip_number_;
   size_t border_;
-  TrieTree tree_;
 
   size_t ProcessComplexValue(StarContext& context, skchar_t* buffer,
                              size_t start_index, size_t end_index,
