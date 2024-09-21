@@ -60,14 +60,13 @@ StarJson::~StarJson() {}
 bool StarJson::IsEmpty() const { return tree_.IsEmpty(); };
 
 void StarJson::AddKeyword(const skchar_t* buffer, size_t length) {
-  tree_.AddWord(kDOUBLE_QUOTE, buffer, length, 0);
+  tree_.AddWord(kDOUBLE_QUOTE, buffer, length);
 }
 
 bool StarJson::ProcessBuffer(skchar_t* buffer, size_t length) {
-  StarContext context{0, 0};
-
   size_t index = 0;
-  TrieFound found{0, 0, 0};
+  TrieFound found{0, 0};
+  StarContext context{0, 0};
   while (index < length) {
     // Find the KEY prefix
     if (!tree_.SearchWord(found, buffer, index, length)) {

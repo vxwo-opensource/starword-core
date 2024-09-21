@@ -7,14 +7,13 @@ StarText::~StarText() {}
 bool StarText::IsEmpty() const { return tree_.IsEmpty(); };
 
 void StarText::AddKeyword(const skchar_t* buffer, size_t length) {
-  tree_.AddWord(buffer, length, 0);
+  tree_.AddWord(buffer, length);
 }
 
 bool StarText::ProcessBuffer(skchar_t* buffer, size_t length) {
-  StarContext context{0, 0};
-
   size_t index = 0;
-  TrieFound found{0, 0, 0};
+  TrieFound found{0, 0};
+  StarContext context{0, 0};
   while (index < length) {
     // Find the keyword
     if (!tree_.SearchWord(found, buffer, index, length)) {

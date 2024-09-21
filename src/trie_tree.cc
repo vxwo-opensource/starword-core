@@ -6,7 +6,6 @@
 
 typedef struct TrieTree::TrieNode {
   bool is_word;
-  int value;
   size_t length;
   std::unordered_map<skchar_t, struct TrieNode *> children;
 } TrieNode;
@@ -51,7 +50,7 @@ TrieTree::~TrieTree() {
 bool TrieTree::IsEmpty() const { return root_->children.empty(); }
 
 void TrieTree::InsertWord(TrieNode *node, const skchar_t *buffer, size_t length,
-                          int value, size_t base_length) {
+                          size_t extra_length) {
   TrieNode *current = node;
   for (size_t i = 0; i < length; ++i) {
     current = DigTrieNode(current, buffer[i]);
@@ -59,18 +58,16 @@ void TrieTree::InsertWord(TrieNode *node, const skchar_t *buffer, size_t length,
 
   if (!current->is_word) {
     current->is_word = true;
-    current->value = value;
-    current->length = base_length + length;
+    current->length = length + extra_length;
   }
 }
 
-void TrieTree::AddWord(const skchar_t *buffer, size_t length, int value) {
-  InsertWord(root_, buffer, length, value, 0);
+void TrieTree::AddWord(const skchar_t *buffer, size_t length) {
+  InsertWord(root_, buffer, length, 0);
 }
 
-void TrieTree::AddWord(skchar_t prefix, const skchar_t *buffer, size_t length,
-                       int value) {
-  InsertWord(DigTrieNode(root_, prefix), buffer, length, value, 1);
+void TrieTree::AddWord(skchar_t prefix, const skchar_t *buffer, size_t length) {
+  InsertWord(DigTrieNode(root_, prefix), buffer, length, 1);
 }
 
 TrieNode *TrieTree::FindWord(const skchar_t *buffer, size_t start_index,
@@ -98,7 +95,6 @@ bool TrieTree::SearchWord(TrieFound &found, const skchar_t *buffer,
   for (size_t i = start_index; i < end_index; ++i) {
     TrieNode *node = FindWord(buffer, i, end_index);
     if (node != nullptr) {
-      found.value = node->value;
       found.start_index = i;
       found.stop_index = i + node->length;
       return true;
