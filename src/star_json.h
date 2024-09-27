@@ -5,14 +5,16 @@
 
 class StarJson : public StarBase {
  public:
-  StarJson(bool ignore_case, bool skip_number, size_t border);
+  StarJson(bool ignore_case, bool skip_number, size_t left_border,
+           size_t right_border);
 
   void AddKeyword(const skchar_t* buffer, size_t length);
   bool ProcessBuffer(skchar_t* buffer, size_t length);
 
  private:
   bool skip_number_;
-  size_t border_;
+  size_t left_border_;
+  size_t right_border_;
 
   size_t ProcessComplexValue(StarContext& context, skchar_t* buffer,
                              size_t start_index, size_t end_index,

@@ -54,8 +54,12 @@ static ssize_t BufferIndexOfStr(const skchar_t* buffer, size_t start_index,
   return -1;
 }
 
-StarJson::StarJson(bool ignore_case, bool skip_number, size_t border)
-    : StarBase(ignore_case), skip_number_(skip_number), border_(border) {}
+StarJson::StarJson(bool ignore_case, bool skip_number, size_t left_border,
+                   size_t right_border)
+    : StarBase(ignore_case),
+      skip_number_(skip_number),
+      left_border_(left_border),
+      right_border_(right_border) {}
 
 void StarJson::AddKeyword(const skchar_t* buffer, size_t length) {
   tree_.AddWord(kDOUBLE_QUOTE, buffer, length);
@@ -237,8 +241,8 @@ void StarJson::StarBuffer(StarContext& context, skchar_t* buffer,
     return;
   }
 
-  ssize_t left_border = border_;
-  ssize_t right_border = border_;
+  ssize_t left_border = left_border_;
+  ssize_t right_border = right_border_;
   if (left_border >= effective) {
     left_border = effective - 1;
   }
