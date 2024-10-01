@@ -3,9 +3,12 @@
 
 #include "trie_tree.h"
 
-struct StarContext {
-  size_t count;
-  size_t char_length;
+const skchar_t kSTAR = '*';
+
+struct StarOptions {
+  bool ignore_case;
+  size_t left_border;
+  size_t right_border;
 };
 
 class StarBase {
@@ -18,9 +21,18 @@ class StarBase {
   virtual bool ProcessBuffer(skchar_t* buffer, size_t length) = 0;
 
  protected:
-  TrieTree tree_;
+  struct StarContext {
+    size_t count;
+    size_t char_length;
+  };
 
-  StarBase(bool ignore_case);
+  TrieTree tree_;
+  StarOptions options_;
+
+  StarBase(const StarOptions& options);
+
+  virtual void StarBuffer(StarContext& context, skchar_t* buffer,
+                          size_t start_index, size_t end_index);
 };
 
 #endif

@@ -1,9 +1,6 @@
 #include "star_text.h"
 
-StarText::StarText(bool ignore_case, size_t left_border, size_t right_border)
-    : StarBase(ignore_case),
-      left_border_(left_border),
-      right_border_(right_border) {}
+StarText::StarText(const StarOptions& options) : StarBase(options) {}
 
 bool StarText::ProcessBuffer(skchar_t* buffer, size_t length) {
   size_t index = 0;
@@ -20,39 +17,4 @@ bool StarText::ProcessBuffer(skchar_t* buffer, size_t length) {
   }
 
   return context.count > 0;
-}
-
-void StarText::StarBuffer(StarContext& context, skchar_t* buffer,
-                          size_t start_index, size_t end_index) {
-  ssize_t effective = end_index - start_index;
-  if (effective < 1) {
-    return;
-  }
-
-  ssize_t left_border = left_border_;
-  ssize_t right_border = right_border_;
-  if (left_border >= effective) {
-    left_border = effective - 1;
-  }
-  if (left_border < 0) {
-    left_border = 0;
-  }
-  if (right_border >= effective - left_border) {
-    right_border = 0;
-  }
-  if (left_border > 0) {
-    start_index += left_border;
-  }
-  if (right_border > 0) {
-    end_index -= right_border;
-  }
-
-  if (start_index < end_index) {
-    context.count += 1;
-    context.char_length += end_index - start_index;
-
-    while (start_index < end_index) {
-      buffer[start_index++] = kSTAR;
-    }
-  }
 }

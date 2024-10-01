@@ -2,7 +2,7 @@
 #define SKC_BASE_H_
 
 #include <stdint.h>
-#ifndef SKCHAR_IS_U32
+#ifndef SKC_USE_U32
 typedef uint16_t skchar_t;
 #else
 typedef unit32_t skchar_t;
@@ -14,8 +14,6 @@ typedef SSIZE_T ssize_t;
 #else
 #include <sys/types.h>
 #endif
-
-const skchar_t kSTAR = '*';
 
 #ifdef NDEBUG
 #define DebugOutput(...)
