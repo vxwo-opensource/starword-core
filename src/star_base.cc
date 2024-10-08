@@ -18,16 +18,18 @@ void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
   }
 
   ssize_t left_border = options_.left_border;
-  ssize_t right_border = options_.right_border;
   if (left_border >= effective) {
     left_border = effective - 1;
   }
   if (left_border < 0) {
     left_border = 0;
   }
+
+  ssize_t right_border = options_.right_border;
   if (right_border >= effective - left_border) {
     right_border = 0;
   }
+
   if (left_border > 0) {
     start_index += left_border;
   }
@@ -35,12 +37,15 @@ void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
     end_index -= right_border;
   }
 
-  if (start_index < end_index) {
-    context.count += 1;
-    context.char_length += end_index - start_index;
+  effective = end_index - start_index;
+  if (effective < 1) {
+    return;
+  }
 
-    while (start_index < end_index) {
-      buffer[start_index++] = kSTAR;
-    }
+  context.process_count += 1;
+  context.character_count += effective;
+
+  while (start_index < end_index) {
+    buffer[start_index++] = kSTAR;
   }
 }

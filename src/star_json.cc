@@ -105,7 +105,7 @@ bool StarJson::ProcessBuffer(skchar_t* buffer, size_t length) {
     }
   }
 
-  return context.count > 0;
+  return context.process_count > 0;
 }
 
 size_t StarJson::ProcessComplexValue(StarContext& context, skchar_t* buffer,

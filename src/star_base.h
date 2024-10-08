@@ -22,8 +22,8 @@ class StarBase {
 
  protected:
   struct StarContext {
-    size_t count;
-    size_t char_length;
+    size_t process_count;
+    size_t character_count;
   };
 
   TrieTree tree_;

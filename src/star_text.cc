@@ -16,5 +16,5 @@ bool StarText::ProcessBuffer(skchar_t* buffer, size_t length) {
     index = found.stop_index;
   }
 
-  return context.count > 0;
+  return context.process_count > 0;
 }
