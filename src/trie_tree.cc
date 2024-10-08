@@ -39,18 +39,19 @@ TrieTree::~TrieTree() {
     clear_stack.push(it->second);
   }
   root_->children.clear();
-  delete root_;
 
   while (!clear_stack.empty()) {
     TrieNode *node = clear_stack.top();
+    clear_stack.pop();
+
     for (auto it = node->children.begin(); it != node->children.end(); ++it) {
       clear_stack.push(it->second);
     }
     node->children.clear();
-
-    clear_stack.pop();
     delete node;
   }
+
+  delete root_;
 }
 
 bool TrieTree::IsEmpty() const { return root_->children.empty(); }
