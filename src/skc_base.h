@@ -15,10 +15,4 @@ typedef SSIZE_T ssize_t;
 #include <sys/types.h>
 #endif
 
-#ifdef NDEBUG
-#define DebugOutput(...)
-#else
-void DebugOutput(const char *format, ...);
-#endif
-
 #endif
