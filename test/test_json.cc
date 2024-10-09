@@ -3,9 +3,7 @@
 #include "../src/star_json.h"
 #include "my_assert.h"
 
-using std::wstring;
-
-const wstring keyword_phone(L"phone");
+const std::wstring keyword_phone(L"phone");
 
 void test_process_false22() {
   StarOptions options{false, 2, 2};
@@ -81,6 +79,17 @@ void test_ignore_true00() {
 
   std::wstring source(L"{\"mobile\":\"12345678\"}");
   std::wstring target(L"{\"mobile\":\"12345678\"}");
+  engine.ProcessBuffer((skchar_t*)source.data(), source.size());
+  MY_ASSERT_ON(source.compare(target) == 0);
+}
+
+void test_process_empty_false22() {
+  StarOptions options{true, 2, 2};
+  StarJson engine(options, true);
+  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+
+  std::wstring source(L"{\"phone\":\"\"}");
+  std::wstring target(L"{\"phone\":\"\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -244,6 +253,7 @@ int main(int argc, char* argv[]) {
   test_process_true00();
   test_process_true21();
   test_ignore_true00();
+  test_process_empty_false22();
   test_process_array_false22();
   test_process_number_false22();
   test_process_number_array_false22();
