@@ -4,6 +4,10 @@ project ("star-keyword-core" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 
+if(MSVC)
+  add_compile_options("/utf-8")
+endif()
+
 aux_source_directory(src CORE_SOURCES)
 
 add_executable(test-text test/test_text.cc test/my_assert.cc ${CORE_SOURCES})

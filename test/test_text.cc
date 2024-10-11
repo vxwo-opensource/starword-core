@@ -101,10 +101,6 @@ void test_process_utf16_4bytes_before_fasle10() {
   engine.AddKeyword((skchar_t*)keyword_utf16_4bytes.data(),
                     keyword_utf16_4bytes.size());
 
-  for(int i = 0;i<keyword_utf16_4bytes.size(); ++i) {
-    printf("keyword: %0X\n", keyword_utf16_4bytes.data()[i]);
-
-  }
   std::u16string source(u"𝄞𝄞𝄞𝄞𝄞 after");
   std::u16string target(u"𝄞******** after");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
@@ -117,10 +113,6 @@ void test_process_utf16_4bytes_after_fasle01() {
   engine.AddKeyword((skchar_t*)keyword_utf16_4bytes.data(),
                     keyword_utf16_4bytes.size());
 
-  for(int i = 0;i<keyword_utf16_4bytes.size(); ++i) {
-    printf("keyword: %0X\n", keyword_utf16_4bytes.data()[i]);
-
-  }
   std::u16string source(u"before 𝄞𝄞𝄞𝄞𝄞");
   std::u16string target(u"before ********𝄞");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
