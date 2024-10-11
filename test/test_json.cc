@@ -3,15 +3,15 @@
 #include "../src/star_json.h"
 #include "my_assert.h"
 
-const std::wstring keyword_phone(L"phone");
+const std::u16string keyword_phone(u"phone");
 
 void test_process_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":\"12345678\"}");
-  std::wstring target(L"{\"phone\":\"12****78\"}");
+  std::u16string source(u"{\"phone\":\"12345678\"}");
+  std::u16string target(u"{\"phone\":\"12****78\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -21,8 +21,8 @@ void test_process_false20() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":\"12345678\"}");
-  std::wstring target(L"{\"phone\":\"12******\"}");
+  std::u16string source(u"{\"phone\":\"12345678\"}");
+  std::u16string target(u"{\"phone\":\"12******\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -32,8 +32,8 @@ void test_process_false02() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":\"12345678\"}");
-  std::wstring target(L"{\"phone\":\"******78\"}");
+  std::u16string source(u"{\"phone\":\"12345678\"}");
+  std::u16string target(u"{\"phone\":\"******78\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -43,8 +43,8 @@ void test_process_true11() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"PhoNE\":\"12345678\"}");
-  std::wstring target(L"{\"PhoNE\":\"1******8\"}");
+  std::u16string source(u"{\"PhoNE\":\"12345678\"}");
+  std::u16string target(u"{\"PhoNE\":\"1******8\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -54,8 +54,8 @@ void test_process_true00() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"PhoNE\":\"12345678\"}");
-  std::wstring target(L"{\"PhoNE\":\"********\"}");
+  std::u16string source(u"{\"PhoNE\":\"12345678\"}");
+  std::u16string target(u"{\"PhoNE\":\"********\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -65,8 +65,8 @@ void test_process_true21() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"PhoNE\":\"12345678\"}");
-  std::wstring target(L"{\"PhoNE\":\"12*****8\"}");
+  std::u16string source(u"{\"PhoNE\":\"12345678\"}");
+  std::u16string target(u"{\"PhoNE\":\"12*****8\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
 
   MY_ASSERT_ON(source.compare(target) == 0);
@@ -77,8 +77,8 @@ void test_ignore_true00() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"mobile\":\"12345678\"}");
-  std::wstring target(L"{\"mobile\":\"12345678\"}");
+  std::u16string source(u"{\"mobile\":\"12345678\"}");
+  std::u16string target(u"{\"mobile\":\"12345678\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -88,8 +88,8 @@ void test_process_empty_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":\"\"}");
-  std::wstring target(L"{\"phone\":\"\"}");
+  std::u16string source(u"{\"phone\":\"\"}");
+  std::u16string target(u"{\"phone\":\"\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -99,8 +99,8 @@ void test_process_array_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":[\"12345678\",\"12345678\"]}");
-  std::wstring target(L"{\"phone\":[\"12****78\",\"12****78\"]}");
+  std::u16string source(u"{\"phone\":[\"12345678\",\"12345678\"]}");
+  std::u16string target(u"{\"phone\":[\"12****78\",\"12****78\"]}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -110,18 +110,18 @@ void test_process_number_false22() {
   StarJson engine(options, false);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source1(L"{\"phone\": 12345678}");
-  std::wstring target1(L"{\"phone\": 12****78}");
+  std::u16string source1(u"{\"phone\": 12345678}");
+  std::u16string target1(u"{\"phone\": 12****78}");
   engine.ProcessBuffer((skchar_t*)source1.data(), source1.size());
   MY_ASSERT_ON(source1.compare(target1) == 0);
 
-  std::wstring source2(L"{\"phone\": -}");
-  std::wstring target2(L"{\"phone\": *}");
+  std::u16string source2(u"{\"phone\": -}");
+  std::u16string target2(u"{\"phone\": *}");
   engine.ProcessBuffer((skchar_t*)source2.data(), source2.size());
   MY_ASSERT_ON(source2.compare(target2) == 0);
 
-  std::wstring source3(L"{\"phone\": -....}");
-  std::wstring target3(L"{\"phone\": -.*..}");
+  std::u16string source3(u"{\"phone\": -....}");
+  std::u16string target3(u"{\"phone\": -.*..}");
   engine.ProcessBuffer((skchar_t*)source3.data(), source3.size());
   MY_ASSERT_ON(source3.compare(target3) == 0);
 }
@@ -131,8 +131,8 @@ void test_process_number_array_false22() {
   StarJson engine(options, false);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":[12345678,,[12345678]}");
-  std::wstring target(L"{\"phone\":[12****78,,[12345678]}");
+  std::u16string source(u"{\"phone\":[12345678,,[12345678]}");
+  std::u16string target(u"{\"phone\":[12****78,,[12345678]}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -142,8 +142,8 @@ void test_process_level_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":{\"phone\":\"12345678\"}}");
-  std::wstring target(L"{\"phone\":{\"phone\":\"12****78\"}}");
+  std::u16string source(u"{\"phone\":{\"phone\":\"12345678\"}}");
+  std::u16string target(u"{\"phone\":{\"phone\":\"12****78\"}}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -153,28 +153,28 @@ void test_process_multiple_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source1(L"{\"phone\":\"12345678\",\"phone\":\"12345678\"}");
-  std::wstring target1(L"{\"phone\":\"12****78\",\"phone\":\"12****78\"}");
+  std::u16string source1(u"{\"phone\":\"12345678\",\"phone\":\"12345678\"}");
+  std::u16string target1(u"{\"phone\":\"12****78\",\"phone\":\"12****78\"}");
   engine.ProcessBuffer((skchar_t*)source1.data(), source1.size());
   MY_ASSERT_ON(source1.compare(target1) == 0);
 
-  std::wstring source2(L"{\"phone\":null,\"phone\":\"12345678\"}");
-  std::wstring target2(L"{\"phone\":null,\"phone\":\"12****78\"}");
+  std::u16string source2(u"{\"phone\":null,\"phone\":\"12345678\"}");
+  std::u16string target2(u"{\"phone\":null,\"phone\":\"12****78\"}");
   engine.ProcessBuffer((skchar_t*)source2.data(), source2.size());
   MY_ASSERT_ON(source2.compare(target2) == 0);
 
-  std::wstring source3(L"{\"phone\",\"phone\":\"12345678\"}");
-  std::wstring target3(L"{\"phone\",\"phone\":\"12****78\"}");
+  std::u16string source3(u"{\"phone\",\"phone\":\"12345678\"}");
+  std::u16string target3(u"{\"phone\",\"phone\":\"12****78\"}");
   engine.ProcessBuffer((skchar_t*)source3.data(), source3.size());
   MY_ASSERT_ON(source3.compare(target3) == 0);
 
-  std::wstring source4(L"{\"phone\":\"phone\",\"phone\":\"12345678\"}");
-  std::wstring target4(L"{\"phone\":\"ph*ne\",\"phone\":\"12****78\"}");
+  std::u16string source4(u"{\"phone\":\"phone\",\"phone\":\"12345678\"}");
+  std::u16string target4(u"{\"phone\":\"ph*ne\",\"phone\":\"12****78\"}");
   engine.ProcessBuffer((skchar_t*)source4.data(), source4.size());
   MY_ASSERT_ON(source4.compare(target4) == 0);
 
-  std::wstring source5(L"{\"phone\":,\"phone\":\"12345678\"}");
-  std::wstring target5(L"{\"phone\":,\"phone\":\"12****78\"}");
+  std::u16string source5(u"{\"phone\":,\"phone\":\"12345678\"}");
+  std::u16string target5(u"{\"phone\":,\"phone\":\"12****78\"}");
   engine.ProcessBuffer((skchar_t*)source5.data(), source5.size());
   MY_ASSERT_ON(source5.compare(target5) == 0);
 }
@@ -184,8 +184,8 @@ void test_process_inline_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\": {\\\"phone\\\": \\\"12345678\\\"}}");
-  std::wstring target(L"{\"phone\": {\\\"phone\\\": \\\"12****78\\\"}}");
+  std::u16string source(u"{\"phone\": {\\\"phone\\\": \\\"12345678\\\"}}");
+  std::u16string target(u"{\"phone\": {\\\"phone\\\": \\\"12****78\\\"}}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -195,8 +195,8 @@ void test_process_escape_double_quote_first_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":\"\\\"12345678\"}");
-  std::wstring target(L"{\"phone\":\"\\\"******78\"}");
+  std::u16string source(u"{\"phone\":\"\\\"12345678\"}");
+  std::u16string target(u"{\"phone\":\"\\\"******78\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -206,8 +206,8 @@ void test_process_escape_double_quote_middle_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":\"12345\\\"678\"}");
-  std::wstring target(L"{\"phone\":\"12******78\"}");
+  std::u16string source(u"{\"phone\":\"12345\\\"678\"}");
+  std::u16string target(u"{\"phone\":\"12******78\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -217,8 +217,8 @@ void test_process_escape_double_quote_end_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":\"12345678\\\"\"}");
-  std::wstring target(L"{\"phone\":\"12******\\\"\"}");
+  std::u16string source(u"{\"phone\":\"12345678\\\"\"}");
+  std::u16string target(u"{\"phone\":\"12******\\\"\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -228,8 +228,8 @@ void test_process_escape_back_slash_on_end_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":\"12345678\\\\\"}");
-  std::wstring target(L"{\"phone\":\"12******\\\\\"}");
+  std::u16string source(u"{\"phone\":\"12345678\\\\\"}");
+  std::u16string target(u"{\"phone\":\"12******\\\\\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -239,8 +239,8 @@ void test_process_escape_back_slash_only_false22() {
   StarJson engine(options, true);
   engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
 
-  std::wstring source(L"{\"phone\":\"\\\\\\\\\\\\\"}");
-  std::wstring target(L"{\"phone\":\"\\\\**\\\\\"}");
+  std::u16string source(u"{\"phone\":\"\\\\\\\\\\\\\"}");
+  std::u16string target(u"{\"phone\":\"\\\\**\\\\\"}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
