@@ -1,6 +1,6 @@
 #include "star_base.h"
 
-static inline bool IsUtf16ProxyChar(skchar_t v) {
+static inline bool IsUtf16Surrogate(skchar_t v) {
   return v >= 0xD800 && v <= 0xDFFF;
 }
 
@@ -26,8 +26,8 @@ void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
     left_border = effective - 1;
   }
 
-#ifdef SKC_USE_U16
-  if (left_border > 0 && IsUtf16ProxyChar(buffer[start_index + left_border])) {
+#ifdef SKC_USE_UTF16
+  if (left_border > 0 && IsUtf16Surrogate(buffer[start_index + left_border])) {
     left_border += 1;
   }
 #endif
@@ -37,8 +37,8 @@ void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
     right_border = 0;
   }
 
-#ifdef SKC_USE_U16
-  if (right_border > 0 && IsUtf16ProxyChar(buffer[end_index - right_border])) {
+#ifdef SKC_USE_UTF16
+  if (right_border > 0 && IsUtf16Surrogate(buffer[end_index - right_border])) {
     right_border += 1;
   }
 #endif
