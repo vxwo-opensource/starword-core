@@ -15,6 +15,11 @@ struct TrieNode {
   std::unordered_map<skchar_t, struct TrieNode *> children;
 };
 
+struct TrieContext {
+  size_t skip;
+  std::vector<TrieNode *> nodes;
+};
+
 static TrieNode *DigTrieNode(TrieNode *current, skchar_t ch) {
   auto it = current->children.find(ch);
   if (it != current->children.end()) {
@@ -77,34 +82,45 @@ void TrieTree::AddWord(skchar_t prefix, const skchar_t *buffer, size_t length) {
   InsertWord(DigTrieNode(root_, prefix), buffer, length, 1);
 }
 
-TrieNode *TrieTree::FindWord(const skchar_t *buffer, size_t start_index,
-                             size_t end_index) const {
+TrieNode *TrieTree::FindWord(TrieContext &context, const skchar_t *buffer,
+                             size_t start_index, size_t end_index) const {
   TrieNode *current = root_;
-  std::vector<TrieNode *> cached;
 
+  context.skip = 0;
+  context.nodes.clear();
   for (size_t i = start_index; i < end_index; i++) {
     auto child = current->children.find(transform(ignore_case_, buffer[i]));
     if (child == current->children.end()) {
       break;
     }
 
+    ++context.skip;
     current = child->second;
     if (current->is_word) {
-      cached.push_back(current);
+      context.nodes.push_back(current);
     }
   }
 
-  return cached.empty() ? nullptr : cached.back();
+  return context.nodes.empty() ? nullptr : context.nodes.back();
 }
 
 bool TrieTree::SearchWord(TrieFound &found, const skchar_t *buffer,
                           size_t start_index, size_t end_index) const {
-  for (size_t i = start_index; i < end_index; ++i) {
-    TrieNode *node = FindWord(buffer, i, end_index);
+  TrieContext context;
+  size_t pos = start_index;
+
+  while (pos < end_index) {
+    TrieNode *node = FindWord(context, buffer, pos, end_index);
     if (node != nullptr) {
-      found.start_index = i;
-      found.stop_index = i + node->length;
+      found.start_index = pos;
+      found.stop_index = pos + node->length;
       return true;
+    }
+
+    if (context.skip < 2) {
+      ++pos;
+    } else {
+      pos += context.skip;
     }
   }
 

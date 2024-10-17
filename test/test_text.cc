@@ -83,6 +83,27 @@ void test_ignore_true00() {
   MY_ASSERT_ON(source.compare(target) == 0);
 }
 
+void test_skip_length_false00() {
+  StarOptions options{false, 0, 0};
+  StarText engine(options);
+  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+
+  std::u16string source1(u"phonphonphone");
+  std::u16string target1(u"phonphon*****");
+  engine.ProcessBuffer((skchar_t*)source1.data(), source1.size());
+  MY_ASSERT_ON(source1.compare(target1) == 0);
+
+  std::u16string source2(u"ppphone");
+  std::u16string target2(u"pp*****");
+  engine.ProcessBuffer((skchar_t*)source2.data(), source2.size());
+  MY_ASSERT_ON(source2.compare(target2) == 0);
+
+  std::u16string source3(u"phphphone");
+  std::u16string target3(u"phph*****");
+  engine.ProcessBuffer((skchar_t*)source3.data(), source3.size());
+  MY_ASSERT_ON(source3.compare(target3) == 0);
+}
+
 void test_process_utf16_4bytes_middle_fasle00() {
   StarOptions options{false, 0, 0};
   StarText engine(options);
@@ -126,7 +147,9 @@ int main(int argc, char* argv[]) {
   test_process_true11();
   test_process_true00();
   test_process_true21();
+
   test_ignore_true00();
+  test_skip_length_false00();
 
   test_process_utf16_4bytes_middle_fasle00();
   test_process_utf16_4bytes_before_fasle10();
