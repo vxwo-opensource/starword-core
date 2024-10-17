@@ -63,8 +63,8 @@ void StarJson::AddKeyword(const skchar_t* buffer, size_t length) {
 
 bool StarJson::ProcessBuffer(skchar_t* buffer, size_t length) {
   size_t index = 0;
-  TrieFound found{0, 0};
-  StarContext context{0, 0};
+  TrieFound found;
+  StarContext context;
   while (index < length) {
     // Find the KEY prefix
     if (!tree_.SearchWord(found, buffer, index, length)) {

@@ -4,8 +4,8 @@
 #include "skc_base.h"
 
 struct TrieFound {
-  size_t start_index;
-  size_t stop_index;
+  size_t start_index = 0;
+  size_t stop_index = 0;
 };
 
 struct TrieNode;
