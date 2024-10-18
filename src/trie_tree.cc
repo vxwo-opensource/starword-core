@@ -4,8 +4,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "skc_base.h"
-
 static inline skchar_t transform(bool ignore, skchar_t value) {
   return !ignore ? value
                  : ((value >= 'A' && value <= 'Z') ? (value + 0x20) : value);
