@@ -5,10 +5,15 @@
 
 const std::u16string keyword_phone(u"phone");
 
+void setupNormalEngine(StarJson& engine) {
+  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  engine.FinishAdd();
+}
+
 void test_process_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":\"12345678\"}");
   std::u16string target(u"{\"phone\":\"12****78\"}");
@@ -19,7 +24,7 @@ void test_process_false22() {
 void test_process_false20() {
   StarOptions options{false, 2, 0};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":\"12345678\"}");
   std::u16string target(u"{\"phone\":\"12******\"}");
@@ -30,7 +35,7 @@ void test_process_false20() {
 void test_process_false02() {
   StarOptions options{false, 0, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":\"12345678\"}");
   std::u16string target(u"{\"phone\":\"******78\"}");
@@ -41,7 +46,7 @@ void test_process_false02() {
 void test_process_true11() {
   StarOptions options{true, 1, 1};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"PhoNE\":\"12345678\"}");
   std::u16string target(u"{\"PhoNE\":\"1******8\"}");
@@ -52,7 +57,7 @@ void test_process_true11() {
 void test_process_true00() {
   StarOptions options{true, 0, 0};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"PhoNE\":\"12345678\"}");
   std::u16string target(u"{\"PhoNE\":\"********\"}");
@@ -63,7 +68,7 @@ void test_process_true00() {
 void test_process_true21() {
   StarOptions options{true, 2, 1};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"PhoNE\":\"12345678\"}");
   std::u16string target(u"{\"PhoNE\":\"12*****8\"}");
@@ -75,7 +80,7 @@ void test_process_true21() {
 void test_ignore_true00() {
   StarOptions options{true, 2, 1};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"mobile\":\"12345678\"}");
   std::u16string target(u"{\"mobile\":\"12345678\"}");
@@ -86,7 +91,7 @@ void test_ignore_true00() {
 void test_process_empty_false22() {
   StarOptions options{true, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":\"\"}");
   std::u16string target(u"{\"phone\":\"\"}");
@@ -97,7 +102,7 @@ void test_process_empty_false22() {
 void test_process_array_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":[\"12345678\",\"12345678\"]}");
   std::u16string target(u"{\"phone\":[\"12****78\",\"12****78\"]}");
@@ -108,7 +113,7 @@ void test_process_array_false22() {
 void test_process_number_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, false);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source1(u"{\"phone\": 12345678}");
   std::u16string target1(u"{\"phone\": 12****78}");
@@ -129,7 +134,7 @@ void test_process_number_false22() {
 void test_process_number_array_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, false);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":[12345678,,[12345678]}");
   std::u16string target(u"{\"phone\":[12****78,,[12345678]}");
@@ -140,7 +145,7 @@ void test_process_number_array_false22() {
 void test_process_level_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":{\"phone\":\"12345678\"}}");
   std::u16string target(u"{\"phone\":{\"phone\":\"12****78\"}}");
@@ -151,7 +156,7 @@ void test_process_level_false22() {
 void test_process_multiple_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source1(u"{\"phone\":\"12345678\",\"phone\":\"12345678\"}");
   std::u16string target1(u"{\"phone\":\"12****78\",\"phone\":\"12****78\"}");
@@ -182,7 +187,7 @@ void test_process_multiple_false22() {
 void test_process_inline_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\": {\\\"phone\\\": \\\"12345678\\\"}}");
   std::u16string target(u"{\"phone\": {\\\"phone\\\": \\\"12****78\\\"}}");
@@ -193,7 +198,7 @@ void test_process_inline_false22() {
 void test_process_escape_double_quote_first_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":\"\\\"12345678\"}");
   std::u16string target(u"{\"phone\":\"\\\"******78\"}");
@@ -204,7 +209,7 @@ void test_process_escape_double_quote_first_false22() {
 void test_process_escape_double_quote_middle_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":\"12345\\\"678\"}");
   std::u16string target(u"{\"phone\":\"12******78\"}");
@@ -215,7 +220,7 @@ void test_process_escape_double_quote_middle_false22() {
 void test_process_escape_double_quote_end_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":\"12345678\\\"\"}");
   std::u16string target(u"{\"phone\":\"12******\\\"\"}");
@@ -226,7 +231,7 @@ void test_process_escape_double_quote_end_false22() {
 void test_process_escape_back_slash_on_end_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":\"12345678\\\\\"}");
   std::u16string target(u"{\"phone\":\"12******\\\\\"}");
@@ -237,7 +242,7 @@ void test_process_escape_back_slash_on_end_false22() {
 void test_process_escape_back_slash_only_false22() {
   StarOptions options{false, 2, 2};
   StarJson engine(options, true);
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  setupNormalEngine(engine);
 
   std::u16string source(u"{\"phone\":\"\\\\\\\\\\\\\"}");
   std::u16string target(u"{\"phone\":\"\\\\**\\\\\"}");

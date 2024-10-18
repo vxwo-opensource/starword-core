@@ -16,14 +16,15 @@ class StarBase {
   virtual ~StarBase() = 0;
 
   bool IsEmpty() const;
+  void FinishAdd();
 
   virtual void AddKeyword(const skchar_t* buffer, size_t length);
   virtual bool ProcessBuffer(skchar_t* buffer, size_t length) = 0;
 
  protected:
   struct StarContext {
-    size_t process_count = 0;
-    size_t character_count = 0;
+    size_t process_count;
+    size_t character_count;
   };
 
   TrieTree tree_;

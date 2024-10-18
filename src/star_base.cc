@@ -10,6 +10,8 @@ StarBase::~StarBase() {}
 
 bool StarBase::IsEmpty() const { return tree_.IsEmpty(); }
 
+void StarBase::FinishAdd() { tree_.FinishAdd(); }
+
 void StarBase::AddKeyword(const skchar_t* buffer, size_t length) {
   tree_.AddWord(buffer, length);
 }

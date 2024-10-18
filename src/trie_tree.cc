@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "skc_base.h"
+
 static inline skchar_t transform(bool ignore, skchar_t value) {
   return !ignore ? value
                  : ((value >= 'A' && value <= 'Z') ? (value + 0x20) : value);
@@ -11,6 +13,7 @@ static inline skchar_t transform(bool ignore, skchar_t value) {
 
 struct TrieNode {
   bool is_word;
+  size_t skip;
   size_t length;
   std::unordered_map<skchar_t, struct TrieNode *> children;
 };
@@ -82,6 +85,33 @@ void TrieTree::AddWord(skchar_t prefix, const skchar_t *buffer, size_t length) {
   InsertWord(DigTrieNode(root_, prefix), buffer, length, 1);
 }
 
+void TrieTree::FinishAdd() {
+  std::stack<TrieNode *> skip_stack;
+
+  for (auto it = root_->children.begin(); it != root_->children.end(); ++it) {
+    TrieNode *node = it->second;
+    node->skip = 1;
+    skip_stack.push(node);
+  }
+
+  while (!skip_stack.empty()) {
+    TrieNode *node = skip_stack.top();
+    skip_stack.pop();
+
+    for (auto it = node->children.begin(); it != node->children.end(); ++it) {
+      TrieNode *child = it->second;
+
+      if (root_->children.find(it->first) != root_->children.end()) {
+        child->skip = 1;
+      } else {
+        child->skip = node->skip + 1;
+      }
+
+      skip_stack.push(child);
+    }
+  }
+}
+
 TrieNode *TrieTree::FindWord(TrieContext &context, const skchar_t *buffer,
                              size_t start_index, size_t end_index) const {
   TrieNode *current = root_;
@@ -94,8 +124,9 @@ TrieNode *TrieTree::FindWord(TrieContext &context, const skchar_t *buffer,
       break;
     }
 
-    ++context.skip;
     current = child->second;
+
+    context.skip = current->skip;
     if (current->is_word) {
       context.nodes.push_back(current);
     }

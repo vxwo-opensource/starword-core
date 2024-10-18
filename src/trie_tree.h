@@ -4,8 +4,8 @@
 #include "skc_base.h"
 
 struct TrieFound {
-  size_t start_index = 0;
-  size_t stop_index = 0;
+  size_t start_index;
+  size_t stop_index;
 };
 
 struct TrieNode;
@@ -19,6 +19,7 @@ class TrieTree final {
 
   void AddWord(const skchar_t* buffer, size_t length);
   void AddWord(skchar_t prefix, const skchar_t* buffer, size_t length);
+  void FinishAdd();
 
   bool SearchWord(TrieFound& found, const skchar_t* buffer, size_t start_index,
                   size_t end_index) const;
