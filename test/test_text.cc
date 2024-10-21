@@ -3,13 +3,12 @@
 #include "../src/star_text.h"
 #include "my_assert.h"
 
-const std::u16string keyword_phone(u"phone");
-const std::u16string keyword_utf16_4bytes(u"𝄞𝄞𝄞𝄞𝄞");
+const std::u16string word_phone(u"phone");
+const std::u16string word_utf16_4bytes(u"𝄞𝄞𝄞𝄞𝄞");
 
 void setupNormalEngine(StarText& engine) {
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
-  engine.AddKeyword((skchar_t*)keyword_utf16_4bytes.data(),
-                    keyword_utf16_4bytes.size());
+  engine.AddWord((skchar_t*)word_phone.data(), word_phone.size());
+  engine.AddWord((skchar_t*)word_utf16_4bytes.data(), word_utf16_4bytes.size());
   engine.FinishAdd();
 }
 
@@ -145,15 +144,15 @@ void test_skip_length_sample() {
 }
 
 void test_skip_length_complex() {
-  const std::u16string keyword_short1(u"def");
-  const std::u16string keyword_short2(u"abcd");
-  const std::u16string keyword_long(u"abcdefg");
+  const std::u16string word_short1(u"def");
+  const std::u16string word_short2(u"abcd");
+  const std::u16string word_long(u"abcdefg");
 
   StarOptions options{false, 0, 0};
   StarText engine(options);
-  engine.AddKeyword((skchar_t*)keyword_short1.data(), keyword_short1.size());
-  engine.AddKeyword((skchar_t*)keyword_short2.data(), keyword_short2.size());
-  engine.AddKeyword((skchar_t*)keyword_long.data(), keyword_long.size());
+  engine.AddWord((skchar_t*)word_short1.data(), word_short1.size());
+  engine.AddWord((skchar_t*)word_short2.data(), word_short2.size());
+  engine.AddWord((skchar_t*)word_long.data(), word_long.size());
   engine.FinishAdd();
 
   std::u16string source1(u"aabcdefgg");

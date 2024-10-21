@@ -18,7 +18,7 @@ class StarBase {
   bool IsEmpty() const;
   void FinishAdd();
 
-  virtual void AddKeyword(const skchar_t* buffer, size_t length);
+  virtual void AddWord(const skchar_t* buffer, size_t length);
   virtual bool ProcessBuffer(skchar_t* buffer, size_t length) = 0;
 
  protected:

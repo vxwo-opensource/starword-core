@@ -57,7 +57,7 @@ static ssize_t BufferIndexOfStr(const skchar_t* buffer, size_t start_index,
 StarJson::StarJson(const StarOptions& options, bool skip_number)
     : StarBase(options), skip_number_(skip_number) {}
 
-void StarJson::AddKeyword(const skchar_t* buffer, size_t length) {
+void StarJson::AddWord(const skchar_t* buffer, size_t length) {
   tree_.AddWord(kDOUBLE_QUOTE, buffer, length);
 }
 

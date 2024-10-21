@@ -7,7 +7,6 @@ bool StarText::ProcessBuffer(skchar_t* buffer, size_t length) {
   TrieFound found{};
   StarContext context{};
   while (index < length) {
-    // Find the keyword
     if (!tree_.SearchWord(found, buffer, index, length)) {
       break;
     }

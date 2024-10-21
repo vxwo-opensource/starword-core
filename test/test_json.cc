@@ -3,10 +3,10 @@
 #include "../src/star_json.h"
 #include "my_assert.h"
 
-const std::u16string keyword_phone(u"phone");
+const std::u16string word_phone(u"phone");
 
 void setupNormalEngine(StarJson& engine) {
-  engine.AddKeyword((skchar_t*)keyword_phone.data(), keyword_phone.size());
+  engine.AddWord((skchar_t*)word_phone.data(), word_phone.size());
   engine.FinishAdd();
 }
 

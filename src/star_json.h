@@ -7,7 +7,7 @@ class StarJson : public StarBase {
  public:
   StarJson(const StarOptions& options, bool skip_number);
 
-  void AddKeyword(const skchar_t* buffer, size_t length);
+  void AddWord(const skchar_t* buffer, size_t length);
   bool ProcessBuffer(skchar_t* buffer, size_t length);
 
  protected:
