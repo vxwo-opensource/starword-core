@@ -7,7 +7,7 @@ class StarText : public StarBase {
  public:
   StarText(const StarOptions& options);
 
-  bool ProcessBuffer(skchar_t* buffer, size_t length);
+  bool ProcessBuffer(skchar_t* buffer, size_t length) override;
 };
 
 #endif

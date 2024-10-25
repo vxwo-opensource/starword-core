@@ -199,7 +199,7 @@ size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
     suffix_begin_index = -1;
   }
 
-  // SKip no VALUE suffix
+  // Skip no VALUE suffix
   if (suffix_begin_index < 0) {
     return start_index;
   }
