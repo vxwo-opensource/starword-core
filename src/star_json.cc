@@ -54,8 +54,7 @@ static ssize_t BufferIndexOfStr(const skchar_t* buffer, size_t start_index,
   return -1;
 }
 
-StarJson::StarJson(const StarOptions& options, bool skip_number)
-    : StarBase(options), skip_number_(skip_number) {}
+StarJson::StarJson(const StarOptions& options) : StarBase(options) {}
 
 void StarJson::AddWord(const skchar_t* buffer, size_t length) {
   tree_.AddWord(kDOUBLE_QUOTE, buffer, length);
@@ -167,7 +166,6 @@ size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
   // Find the number
   ssize_t number_end_index = FindNumberEnd(buffer, start_index, end_index);
   if (number_end_index != -1) {
-    StarBuffer(context, buffer, start_index, number_end_index, true);
     return number_end_index;
   }
 
@@ -207,19 +205,14 @@ size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
   }
 
   if (suffix_begin_index > prefix_end_index) {
-    StarBuffer(context, buffer, prefix_end_index, suffix_begin_index, false);
+    StarBuffer(context, buffer, prefix_end_index, suffix_begin_index);
   }
 
   return suffix_begin_index + prefix_length;
 }
 
 void StarJson::StarBuffer(StarContext& context, skchar_t* buffer,
-                          size_t start_index, size_t stop_index,
-                          bool is_number) {
-  if (skip_number_ && is_number) {
-    return;
-  }
-
+                          size_t start_index, size_t stop_index) {
   if (start_index > 0 && buffer[start_index - 1] == kBACKSLASH &&
       BufferForwardSkipChar(buffer, kBACKSLASH, 0, start_index - 1) % 2 != 0) {
     start_index += 1;
