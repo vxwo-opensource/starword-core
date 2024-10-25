@@ -24,7 +24,7 @@ class StarBase {
  protected:
   struct StarContext {
     size_t process_count;
-    size_t character_count;
+    size_t character_total;
   };
 
   TrieTree tree_;
@@ -33,7 +33,7 @@ class StarBase {
   StarBase(const StarOptions& options);
 
   virtual void StarBuffer(StarContext& context, skchar_t* buffer,
-                          size_t start_index, size_t end_index);
+                          size_t start_index, size_t stop_index);
 };
 
 #endif

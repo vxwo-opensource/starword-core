@@ -12,27 +12,27 @@ class StarJson : public StarBase {
 
  protected:
   void StarBuffer(StarContext& context, skchar_t* buffer, size_t start_index,
-                  size_t end_index, bool is_number);
+                  size_t stop_index, bool is_number);
 
  private:
   bool skip_number_;
 
   size_t ProcessComplexValue(StarContext& context, skchar_t* buffer,
-                             size_t start_index, size_t end_index,
+                             size_t start_index, size_t stop_index,
                              bool enter_array);
   size_t ProcessSimpleValue(StarContext& context, skchar_t* buffer,
-                            size_t start_index, size_t end_index);
+                            size_t start_index, size_t stop_index);
 
   static ssize_t FindKeyEnd(const skchar_t* buffer, size_t start_index,
-                            size_t eend_index);
+                            size_t stop_index);
   static ssize_t FindSoftCharEnd(const skchar_t* buffer, skchar_t skip,
                                  skchar_t target, size_t start_index,
-                                 size_t end_index);
+                                 size_t stop_index);
   static ssize_t FindSymbolEnd(const skchar_t* buffer, size_t start_index,
-                               size_t end_index);
+                               size_t stop_index);
 
   static ssize_t FindNumberEnd(const skchar_t* buffer, size_t start_index,
-                               size_t end_index);
+                               size_t stop_index);
 };
 
 #endif

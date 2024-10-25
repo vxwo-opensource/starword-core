@@ -17,8 +17,8 @@ void StarBase::AddWord(const skchar_t* buffer, size_t length) {
 }
 
 void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
-                          size_t start_index, size_t end_index) {
-  ssize_t effective = end_index - start_index;
+                          size_t start_index, size_t stop_index) {
+  ssize_t effective = stop_index - start_index;
   if (effective < 1) {
     return;
   }
@@ -40,7 +40,7 @@ void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
   }
 
 #ifdef SKC_USE_UTF16
-  if (right_border > 0 && IsUtf16Surrogate(buffer[end_index - right_border])) {
+  if (right_border > 0 && IsUtf16Surrogate(buffer[stop_index - right_border])) {
     right_border += 1;
   }
 #endif
@@ -49,18 +49,26 @@ void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
     start_index += left_border;
   }
   if (right_border > 0) {
-    end_index -= right_border;
+    stop_index -= right_border;
   }
 
-  effective = end_index - start_index;
+  effective = stop_index - start_index;
   if (effective < 1) {
     return;
   }
 
   context.process_count += 1;
-  context.character_count += effective;
+  context.character_total += effective;
 
-  while (start_index < end_index) {
-    buffer[start_index++] = kSTAR;
+  size_t pos = start_index;
+  while (pos + 4 < stop_index) {
+    buffer[pos] = kSTAR;
+    buffer[pos + 1] = kSTAR;
+    buffer[pos + 2] = kSTAR;
+    buffer[pos + 3] = kSTAR;
+    pos += 4;
+  }
+  while (pos < stop_index) {
+    buffer[pos++] = kSTAR;
   }
 }

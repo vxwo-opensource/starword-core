@@ -11,36 +11,36 @@ const skchar_t kLEFT_BRACE = '{';
 const skchar_t kLEFT_BRACKET = '[';
 
 static size_t BufferSkipChar(const skchar_t* buffer, skchar_t ch,
-                             size_t start_index, size_t end_index) {
+                             size_t start_index, size_t stop_index) {
   size_t index = start_index;
-  while (index < end_index && buffer[index] == ch) {
+  while (index < stop_index && buffer[index] == ch) {
     ++index;
   }
   return index - start_index;
 }
 
 static size_t BufferForwardSkipChar(const skchar_t* buffer, skchar_t ch,
-                                    size_t start_index, size_t end_index) {
-  size_t index = end_index;
+                                    size_t start_index, size_t stop_index) {
+  size_t index = stop_index;
   while (index >= start_index && buffer[index] == ch) {
     --index;
   }
-  return end_index - index;
+  return stop_index - index;
 }
 
 static ssize_t BufferIndexOfStr(const skchar_t* buffer, size_t start_index,
-                                size_t end_index, const skchar_t* str,
-                                size_t str_start_index, size_t str_end_index) {
+                                size_t stop_index, const skchar_t* str,
+                                size_t str_start_index, size_t str_stop_index) {
   skchar_t first_char = str[str_start_index];
-  size_t str_count = str_end_index - str_start_index;
+  size_t str_count = str_stop_index - str_start_index;
 
-  size_t stop_index = end_index - str_count;
-  for (size_t i = start_index; i <= stop_index; i++) {
+  size_t last_index = stop_index - str_count;
+  for (size_t i = start_index; i <= last_index; i++) {
     if (buffer[i] != first_char) {
-      while (++i <= stop_index && buffer[i] != first_char);
+      while (++i <= last_index && buffer[i] != first_char);
     }
 
-    if (i <= stop_index) {
+    if (i <= last_index) {
       size_t j = i + 1;
       size_t end = j + str_count - 1;
       for (size_t k = str_start_index + 1; j < end && buffer[j] == str[k];
@@ -214,7 +214,7 @@ size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
 }
 
 void StarJson::StarBuffer(StarContext& context, skchar_t* buffer,
-                          size_t start_index, size_t end_index,
+                          size_t start_index, size_t stop_index,
                           bool is_number) {
   if (skip_number_ && is_number) {
     return;
@@ -225,20 +225,20 @@ void StarJson::StarBuffer(StarContext& context, skchar_t* buffer,
     start_index += 1;
   }
 
-  if (end_index > 0 && buffer[end_index - 1] == kBACKSLASH &&
-      BufferForwardSkipChar(buffer, kBACKSLASH, start_index, end_index - 1) %
+  if (stop_index > 0 && buffer[stop_index - 1] == kBACKSLASH &&
+      BufferForwardSkipChar(buffer, kBACKSLASH, start_index, stop_index - 1) %
               2 !=
           0) {
-    end_index -= 1;
+    stop_index -= 1;
   }
 
-  StarBase::StarBuffer(context, buffer, start_index, end_index);
+  StarBase::StarBuffer(context, buffer, start_index, stop_index);
 }
 
 ssize_t StarJson::FindKeyEnd(const skchar_t* buffer, size_t start_index,
-                             size_t end_index) {
+                             size_t stop_index) {
   ssize_t index = -1;
-  for (size_t i = start_index; i < end_index; ++i) {
+  for (size_t i = start_index; i < stop_index; ++i) {
     skchar_t ch = buffer[i];
     if (ch == kBACKSLASH || ch == kDOUBLE_QUOTE) {
       index = i;
@@ -250,18 +250,18 @@ ssize_t StarJson::FindKeyEnd(const skchar_t* buffer, size_t start_index,
 
 ssize_t StarJson::FindSoftCharEnd(const skchar_t* buffer, skchar_t skip,
                                   skchar_t target, size_t start_index,
-                                  size_t end_index) {
+                                  size_t stop_index) {
   size_t index =
-      start_index + BufferSkipChar(buffer, skip, start_index, end_index);
-  if (index >= end_index || buffer[index] != target) {
+      start_index + BufferSkipChar(buffer, skip, start_index, stop_index);
+  if (index >= stop_index || buffer[index] != target) {
     return -1;
   }
   return index + 1;
 }
 
 ssize_t StarJson::FindSymbolEnd(const skchar_t* buffer, size_t start_index,
-                                size_t end_index) {
-  size_t size = end_index - start_index;
+                                size_t stop_index) {
+  size_t size = stop_index - start_index;
   if (size < 4) {
     return -1;
   }
@@ -289,9 +289,9 @@ ssize_t StarJson::FindSymbolEnd(const skchar_t* buffer, size_t start_index,
 }
 
 ssize_t StarJson::FindNumberEnd(const skchar_t* buffer, size_t start_index,
-                                size_t end_index) {
+                                size_t stop_index) {
   size_t index = start_index;
-  while (index < end_index) {
+  while (index < stop_index) {
     skchar_t ch = buffer[index];
     if (!((ch >= '0' && ch <= '9') || ch == '.' || ch == '-' || ch == '+' ||
           ch == 'e' || ch == 'E')) {

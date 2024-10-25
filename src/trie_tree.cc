@@ -111,12 +111,12 @@ void TrieTree::FinishAdd() {
 }
 
 TrieNode *TrieTree::FindWord(TrieContext &context, const skchar_t *buffer,
-                             size_t start_index, size_t end_index) const {
+                             size_t start_index, size_t stop_index) const {
   TrieNode *current = root_;
 
   context.skip = 0;
   context.nodes.clear();
-  for (size_t i = start_index; i < end_index; i++) {
+  for (size_t i = start_index; i < stop_index; i++) {
     auto child = current->children.find(transform(ignore_case_, buffer[i]));
     if (child == current->children.end()) {
       break;
@@ -134,23 +134,19 @@ TrieNode *TrieTree::FindWord(TrieContext &context, const skchar_t *buffer,
 }
 
 bool TrieTree::SearchWord(TrieFound &found, const skchar_t *buffer,
-                          size_t start_index, size_t end_index) const {
-  TrieContext context;
+                          size_t start_index, size_t stop_index) const {
+  TrieContext context{};
   size_t pos = start_index;
 
-  while (pos < end_index) {
-    TrieNode *node = FindWord(context, buffer, pos, end_index);
+  while (pos < stop_index) {
+    TrieNode *node = FindWord(context, buffer, pos, stop_index);
     if (node != nullptr) {
       found.start_index = pos;
       found.stop_index = pos + node->length;
       return true;
     }
 
-    if (context.skip < 2) {
-      ++pos;
-    } else {
-      pos += context.skip;
-    }
+    pos += context.skip < 2 ? 1 : context.skip;
   }
 
   return false;

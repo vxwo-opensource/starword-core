@@ -22,7 +22,7 @@ class TrieTree final {
   void FinishAdd();
 
   bool SearchWord(TrieFound& found, const skchar_t* buffer, size_t start_index,
-                  size_t end_index) const;
+                  size_t stop_index) const;
 
  private:
   TrieNode* root_;
@@ -32,7 +32,7 @@ class TrieTree final {
                   size_t extra_length);
 
   TrieNode* FindWord(TrieContext& context, const skchar_t* buffer,
-                     size_t start_index, size_t end_index) const;
+                     size_t start_index, size_t stop_index) const;
 };
 
 #endif
