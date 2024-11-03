@@ -16,23 +16,18 @@ struct TrieNode {
   std::unordered_map<skchar_t, struct TrieNode *> children;
 };
 
-struct TrieContext {
-  size_t skip;
-  std::vector<TrieNode *> nodes;
-};
-
-static TrieNode *DigTrieNode(TrieNode *current, skchar_t ch) {
-  auto it = current->children.find(ch);
-  if (it != current->children.end()) {
-    current = it->second;
+static TrieNode *DigTrieNode(TrieNode *cursor, skchar_t ch) {
+  auto it = cursor->children.find(ch);
+  if (it != cursor->children.end()) {
+    cursor = it->second;
   } else {
     TrieNode *node = new TrieNode();
     node->is_word = false;
-    current->children.insert(std::make_pair(ch, node));
-    current = node;
+    cursor->children.insert(std::make_pair(ch, node));
+    cursor = node;
   }
 
-  return current;
+  return cursor;
 }
 
 TrieTree::TrieTree(bool ignore_case)
@@ -64,14 +59,14 @@ bool TrieTree::IsEmpty() const { return root_->children.empty(); }
 
 void TrieTree::InsertWord(TrieNode *node, const skchar_t *buffer, size_t length,
                           size_t extra_length) {
-  TrieNode *current = node;
+  TrieNode *cursor = node;
   for (size_t i = 0; i < length; ++i) {
-    current = DigTrieNode(current, transform(ignore_case_, buffer[i]));
+    cursor = DigTrieNode(cursor, transform(ignore_case_, buffer[i]));
   }
 
-  if (!current->is_word) {
-    current->is_word = true;
-    current->length = length + extra_length;
+  if (!cursor->is_word) {
+    cursor->is_word = true;
+    cursor->length = length + extra_length;
   }
 }
 
@@ -110,44 +105,42 @@ void TrieTree::FinishAdd() {
   }
 }
 
-TrieNode *TrieTree::FindWord(TrieContext &context, const skchar_t *buffer,
-                             size_t start_index, size_t stop_index) const {
-  TrieNode *current = root_;
-
-  context.skip = 0;
-  context.nodes.clear();
-  for (size_t i = start_index; i < stop_index; i++) {
-    auto child = current->children.find(transform(ignore_case_, buffer[i]));
-    if (child == current->children.end()) {
-      break;
-    }
-
-    current = child->second;
-
-    context.skip = current->skip;
-    if (current->is_word) {
-      context.nodes.push_back(current);
-    }
-  }
-
-  return context.nodes.empty() ? nullptr : context.nodes.back();
-}
-
 bool TrieTree::SearchWord(TrieFound &found, const skchar_t *buffer,
                           size_t start_index, size_t stop_index) const {
-  TrieContext context{};
-  size_t pos = start_index;
+  bool found_word = false;
+  TrieNode *cursor = root_;
+  std::vector<TrieNode *> save_nodes;
+  size_t pos = start_index, save_skip = 0, save_pos = pos;
 
   while (pos < stop_index) {
-    TrieNode *node = FindWord(context, buffer, pos, stop_index);
-    if (node != nullptr) {
-      found.start_index = pos;
-      found.stop_index = pos + node->length;
-      return true;
-    }
+    auto child = cursor->children.find(transform(ignore_case_, buffer[pos]));
+    if (child != cursor->children.end()) {
+      ++pos;
+      cursor = child->second;
 
-    pos += context.skip < 2 ? 1 : context.skip;
+      save_skip = cursor->skip;
+      if (cursor->is_word) {
+        found_word = true;
+        save_nodes.push_back(cursor);
+      }
+    } else {
+      if (found_word) {
+        break;
+      }
+
+      cursor = root_;
+      pos = save_pos + (save_skip < 2 ? 1 : save_skip);
+      save_skip = 0;
+      save_pos = pos;
+    }
   }
 
-  return false;
+  if (!found_word) {
+    return false;
+  }
+
+  TrieNode *node = save_nodes.back();
+  found.start_index = save_pos;
+  found.stop_index = save_pos + node->length;
+  return true;
 }

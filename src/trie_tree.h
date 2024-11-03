@@ -9,7 +9,6 @@ struct TrieFound {
 };
 
 struct TrieNode;
-struct TrieContext;
 class TrieTree final {
  public:
   TrieTree(bool ignore_case);
@@ -30,9 +29,6 @@ class TrieTree final {
 
   void InsertWord(TrieNode* node, const skchar_t* buffer, size_t length,
                   size_t extra_length);
-
-  TrieNode* FindWord(TrieContext& context, const skchar_t* buffer,
-                     size_t start_index, size_t stop_index) const;
 };
 
 #endif
