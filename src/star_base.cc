@@ -18,12 +18,12 @@ void StarBase::AddWord(const skchar_t* buffer, size_t length) {
 
 void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
                           size_t start_index, size_t stop_index) {
-  ssize_t effective = stop_index - start_index;
+  size_t effective = stop_index - start_index;
   if (effective < 1) {
     return;
   }
 
-  ssize_t left_border = options_.left_border;
+  size_t left_border = options_.left_border;
   if (left_border >= effective) {
     left_border = effective - 1;
   }
@@ -34,7 +34,7 @@ void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
   }
 #endif
 
-  ssize_t right_border = options_.right_border;
+  size_t right_border = options_.right_border;
   if (right_border >= effective - left_border) {
     right_border = 0;
   }

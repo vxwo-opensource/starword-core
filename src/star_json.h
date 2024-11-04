@@ -20,17 +20,6 @@ class StarJson : public StarBase {
                              bool enter_array);
   size_t ProcessSimpleValue(StarContext& context, skchar_t* buffer,
                             size_t start_index, size_t stop_index);
-
-  static ssize_t FindKeyEnd(const skchar_t* buffer, size_t start_index,
-                            size_t stop_index);
-  static ssize_t FindSoftCharEnd(const skchar_t* buffer, skchar_t skip,
-                                 skchar_t target, size_t start_index,
-                                 size_t stop_index);
-  static ssize_t FindSymbolEnd(const skchar_t* buffer, size_t start_index,
-                               size_t stop_index);
-
-  static ssize_t FindNumberEnd(const skchar_t* buffer, size_t start_index,
-                               size_t stop_index);
 };
 
 #endif

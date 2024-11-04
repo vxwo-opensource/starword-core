@@ -9,11 +9,4 @@ typedef char32_t skchar_t;
 typedef char16_t skchar_t;
 #endif
 
-#if defined(_MSC_VER)
-#include <basetsd.h>
-typedef SSIZE_T ssize_t;
-#else
-#include <sys/types.h>
-#endif
-
 #endif
