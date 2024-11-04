@@ -218,6 +218,22 @@ void test_process_escape_back_slash_only_false22() {
   MY_ASSERT_ON(source.compare(target) == 0);
 }
 
+void test_process_escape_inline_false22() {
+  StarOptions options{false, 2, 2};
+  StarJson engine(options);
+  setupNormalEngine(engine);
+
+  std::u16string source1(u"{\"phone\": \"{\\\"phone\\\":\\\"12345678\\\"}\"}");
+  std::u16string target1(u"{\"phone\": \"{\\********************\"}\"}");
+  engine.ProcessBuffer((skchar_t*)source1.data(), source1.size());
+  MY_ASSERT_ON(source1.compare(target1) == 0);
+
+  std::u16string source2(u"{\"mobile\": \"{\\\"phone\\\":\\\"12345678\\\"}\"}");
+  std::u16string target2(u"{\"mobile\": \"{\\\"phone\\\":\\\"12****78\\\"}\"}");
+  engine.ProcessBuffer((skchar_t*)source2.data(), source2.size());
+  MY_ASSERT_ON(source2.compare(target2) == 0);
+}
+
 int main(int argc, char* argv[]) {
   test_process_false22();
   test_process_false20();
@@ -236,6 +252,7 @@ int main(int argc, char* argv[]) {
   test_process_escape_double_quote_end_false22();
   test_process_escape_back_slash_on_end_false22();
   test_process_escape_back_slash_only_false22();
+  test_process_escape_inline_false22();
 
   return MY_ASSERT_RESULT();
 }

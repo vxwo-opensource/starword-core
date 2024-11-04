@@ -56,18 +56,6 @@ static bool BufferIndexOfStr(size_t& out_index, const skchar_t* buffer,
   return false;
 }
 
-static bool TryFindKeyEnd(size_t& out_index, const skchar_t* buffer,
-                          size_t start_index, size_t stop_index) {
-  for (size_t i = start_index; i < stop_index; ++i) {
-    skchar_t ch = buffer[i];
-    if (ch == kBACKSLASH || ch == kDOUBLE_QUOTE) {
-      out_index = i;
-      return true;
-    }
-  }
-  return false;
-}
-
 static bool TryFindSoftCharEnd(size_t& out_index, const skchar_t* buffer,
                                skchar_t skip, skchar_t target,
                                size_t start_index, size_t stop_index) {
@@ -150,37 +138,24 @@ bool StarJson::ProcessBuffer(skchar_t* buffer, size_t length) {
   size_t pos = 0;
   while (pos < length) {
     // Find the KEY prefix
-    if (!tree_.SearchWord(found, buffer, pos, length)) {
+    if (!tree_.SearchWord(found, buffer, pos, length) ||
+        found.stop_index >= length) {
       break;
     }
 
-    if (found.stop_index >= length) {
-      break;
-    }
-
-    // Find an exact matching for the KEY suffix
-    size_t begin_index = 0;
-    if (!TryFindKeyEnd(begin_index, buffer, found.stop_index, length)) {
+    // Find the KEY suffix
+    size_t key_end_index = 0;
+    if (!TryFindSoftCharEnd(key_end_index, buffer, kBACKSLASH, kDOUBLE_QUOTE,
+                            found.stop_index, length)) {
       pos = found.stop_index;
-      continue;
-    } else if (begin_index != found.stop_index) {
-      pos = begin_index;
-      continue;
-    }
-
-    // Find the symbol `double quote`
-    size_t end_index = 0;
-    if (!TryFindSoftCharEnd(end_index, buffer, kBACKSLASH, kDOUBLE_QUOTE,
-                            begin_index, length)) {
-      pos = begin_index;
       continue;
     }
 
     // Find the symbol `colon`
     size_t colon_index = 0;
-    if (!TryFindSoftCharEnd(colon_index, buffer, kBLANK, kCOLON, end_index,
+    if (!TryFindSoftCharEnd(colon_index, buffer, kBLANK, kCOLON, key_end_index,
                             length)) {
-      pos = end_index;
+      pos = key_end_index;
       continue;
     }
 
