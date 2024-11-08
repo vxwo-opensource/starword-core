@@ -56,72 +56,26 @@ static bool BufferIndexOfStr(size_t& out_index, const skchar_t* buffer,
   return false;
 }
 
-static bool TryFindSoftCharEnd(size_t& out_index, const skchar_t* buffer,
-                               skchar_t skip, skchar_t target,
-                               size_t start_index, size_t stop_index) {
-  size_t pos =
-      start_index + BufferSkipChar(buffer, skip, start_index, stop_index);
-  if (pos >= stop_index || buffer[pos] != target) {
+bool SmartSearchTargetChar(size_t& out_index, const skchar_t* buffer,
+                           skchar_t skip, skchar_t target, size_t start_index,
+                           size_t stop_index) {
+  if (start_index >= stop_index) {
+    return false;
+  }
+
+  size_t pos = start_index;
+  if (buffer[pos] == skip) {
+    pos += BufferSkipChar(buffer, skip, pos, stop_index);
+    if (pos >= stop_index) {
+      return false;
+    }
+  }
+
+  if (buffer[pos] != target) {
     return false;
   }
 
   out_index = pos + 1;
-  return true;
-}
-
-static bool TryFindNumberEnd(size_t& out_index, const skchar_t* buffer,
-                             size_t start_index, size_t stop_index) {
-  size_t pos = start_index;
-  while (pos < stop_index) {
-    skchar_t ch = buffer[pos];
-    if (!((ch >= '0' && ch <= '9') || ch == '.' || ch == '-' || ch == '+' ||
-          ch == 'e' || ch == 'E')) {
-      break;
-    }
-
-    ++pos;
-  }
-
-  if (pos <= start_index) {
-    return false;
-  }
-
-  out_index = pos;
-  return true;
-}
-
-static bool TryFindSymbolEnd(size_t& out_index, const skchar_t* buffer,
-                             size_t start_index, size_t stop_index) {
-  size_t size = stop_index - start_index;
-  if (size < 4) {
-    return false;
-  }
-
-  int length = 0;
-  skchar_t first_char = buffer[start_index];
-
-  if (first_char == 'n') {  // Test the symbol null
-    if (buffer[start_index + 1] == 'u' && buffer[start_index + 2] == 'l' &&
-        buffer[start_index + 3] == 'l') {
-      length = 4;
-    }
-  } else if (first_char == 't') {  // Test the symbol true
-    if (buffer[start_index + 1] == 'r' && buffer[start_index + 2] == 'u' &&
-        buffer[start_index + 3] == 'e') {
-      length = 4;
-    }
-  } else if (size > 4 && first_char == 'f') {  // Test the symbol false
-    if (buffer[start_index + 1] == 'a' && buffer[start_index + 2] == 'l' &&
-        buffer[start_index + 3] == 's' && buffer[start_index + 4] == 'e') {
-      length = 5;
-    }
-  }
-
-  if (length < 1) {
-    return false;
-  }
-
-  out_index = length;
   return true;
 }
 
@@ -144,127 +98,130 @@ bool StarJson::ProcessBuffer(skchar_t* buffer, size_t length) {
     }
 
     // Find the KEY suffix
-    size_t key_end_index = 0;
-    if (!TryFindSoftCharEnd(key_end_index, buffer, kBACKSLASH, kDOUBLE_QUOTE,
-                            found.stop_index, length)) {
+    size_t key_next_index = 0;
+    if (!SmartSearchTargetChar(key_next_index, buffer, kBACKSLASH,
+                               kDOUBLE_QUOTE, found.stop_index, length)) {
       pos = found.stop_index;
       continue;
     }
 
-    // Find the symbol `colon`
-    size_t colon_index = 0;
-    if (!TryFindSoftCharEnd(colon_index, buffer, kBLANK, kCOLON, key_end_index,
-                            length)) {
-      pos = key_end_index;
+    // Find the KEY/VALUE separator
+    size_t colon_next_index = 0;
+    if (!SmartSearchTargetChar(colon_next_index, buffer, kBLANK, kCOLON,
+                               key_next_index, length)) {
+      pos = key_next_index;
       continue;
     }
 
-    pos = ProcessComplexValue(context, buffer, colon_index, length, true);
+    pos = ProcessComplexValue(context, buffer, colon_next_index, length, true);
   }
 
   return context.process_count > 0;
 }
 
 size_t StarJson::ProcessComplexValue(StarContext& context, skchar_t* buffer,
-                                     size_t start_index, size_t end_index,
+                                     size_t start_index, size_t stop_index,
                                      bool enter_array) {
   // Skip blank
-  size_t prefix_begin_index =
-      start_index + BufferSkipChar(buffer, kBLANK, start_index, end_index);
-  if (prefix_begin_index >= end_index) {
-    return prefix_begin_index;
+  size_t begin_index =
+      start_index + BufferSkipChar(buffer, kBLANK, start_index, stop_index);
+  if (begin_index >= stop_index) {
+    return begin_index;
   }
 
-  // Test value is symbol
-  size_t symbol_end_index = 0;
-  if (TryFindSymbolEnd(symbol_end_index, buffer, prefix_begin_index,
-                       end_index)) {
-    return symbol_end_index;
-  }
+  skchar_t first_char = buffer[begin_index];
 
-  skchar_t first_char = buffer[prefix_begin_index];
-
-  // Test value is object
+  // Skip OBJECT type
   if (first_char == kLEFT_BRACE) {
-    return prefix_begin_index + 1;
+    return begin_index + 1;
   }
 
+  // Process simple types
   if (first_char != kLEFT_BRACKET) {
-    return ProcessSimpleValue(context, buffer, prefix_begin_index, end_index);
-  } else if (!enter_array) {
-    return prefix_begin_index + 1;
-  } else {
-    size_t pos = prefix_begin_index + 1;
-    while (pos < end_index) {
-      size_t next_end_index =
-          ProcessComplexValue(context, buffer, pos, end_index, false);
-
-      // Skip blank
-      next_end_index +=
-          BufferSkipChar(buffer, kBLANK, next_end_index, end_index);
-      if (next_end_index >= end_index) {
-        pos = next_end_index;
-        break;
-      }
-
-      pos = next_end_index + 1;
-
-      // Find the symbol `comma`
-      skchar_t stop_char = buffer[next_end_index];
-      if (stop_char != kCOMMA) {
-        break;
-      }
-    }
-    return pos;
+    return ProcessSimpleValue(context, buffer, begin_index, stop_index);
   }
+
+  // Skipping ARRAY nesting
+  if (!enter_array) {
+    return begin_index + 1;
+  }
+
+  size_t pos = begin_index + 1;
+  while (pos < stop_index) {
+    size_t next_index =
+        ProcessComplexValue(context, buffer, pos, stop_index, false);
+
+    // Skip blank
+    next_index += BufferSkipChar(buffer, kBLANK, next_index, stop_index);
+    if (next_index >= stop_index) {
+      pos = next_index;
+      break;
+    }
+
+    pos = next_index + 1;
+
+    // Find the ARRAY separator
+    if (buffer[next_index] != kCOMMA) {
+      break;
+    }
+  }
+  return pos;
 }
 
 size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
-                                    size_t start_index, size_t end_index) {
-  // Find the number
-  size_t number_end_index = 0;
-  if (TryFindNumberEnd(number_end_index, buffer, start_index, end_index)) {
-    return number_end_index;
+                                    size_t start_index, size_t stop_index) {
+  // Skip NUMBER and SYMBOL
+  size_t pos = start_index;
+  while (pos < stop_index) {
+    skchar_t ch = buffer[pos];
+    if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') ||
+          (ch >= '0' && ch <= '9') || ch == '.' || ch == '-' || ch == '+')) {
+      break;
+    }
+
+    ++pos;
+  }
+  if (pos > start_index) {
+    return pos;
   }
 
-  // Find the symbol `double quote`
-  size_t prefix_end_index = 0;
-  if (!TryFindSoftCharEnd(prefix_end_index, buffer, kBACKSLASH, kDOUBLE_QUOTE,
-                          start_index, end_index)) {
+  // Find the TEXT prefix
+  size_t value_begin_index = 0;
+  if (!SmartSearchTargetChar(value_begin_index, buffer, kBACKSLASH,
+                             kDOUBLE_QUOTE, start_index, stop_index)) {
     return start_index;
   }
 
-  size_t prefix_length = prefix_end_index - start_index;
+  size_t value_end_index = 0;
+  size_t wrapper_length = value_begin_index - start_index;
 
-  // Find the the VALUE suffix
-  size_t suffix_begin_index = 0;
-  size_t pos = prefix_end_index;
-  while (pos < end_index) {
-    if (!BufferIndexOfStr(suffix_begin_index, buffer, pos, end_index, buffer,
-                          start_index, prefix_end_index)) {
+  pos = value_begin_index;
+  while (pos < stop_index) {
+    if (!BufferIndexOfStr(value_end_index, buffer, pos, stop_index, buffer,
+                          start_index, value_begin_index)) {
       break;
     }
 
     // Skip escape characters for an odd number of double quotes
-    size_t number_backslash = BufferForwardSkipChar(
-        buffer, kBACKSLASH, prefix_end_index, suffix_begin_index - 1);
-    if (number_backslash % 2 == 0) {
+    size_t backslash_count = BufferForwardSkipChar(
+        buffer, kBACKSLASH, value_begin_index, value_end_index - 1);
+    if (backslash_count % 2 == 0) {
       break;
     }
 
-    pos = suffix_begin_index + prefix_length;
+    pos = value_end_index + wrapper_length;
   }
 
-  // Skip no VALUE suffix
-  if (suffix_begin_index < 0) {
+  // Skip no TEXT suffix
+  if (value_end_index == 0) {
     return start_index;
   }
 
-  if (suffix_begin_index > prefix_end_index) {
-    StarBuffer(context, buffer, prefix_end_index, suffix_begin_index);
+  if (value_end_index > value_begin_index) {
+    StarBuffer(context, buffer, value_begin_index, value_end_index);
   }
 
-  return suffix_begin_index + prefix_length;
+  return value_end_index + wrapper_length;
 }
 
 void StarJson::StarBuffer(StarContext& context, skchar_t* buffer,
