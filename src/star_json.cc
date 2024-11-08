@@ -1,7 +1,5 @@
 #include "star_json.h"
 
-#include "star_base.h"
-
 const skchar_t kBLANK = ' ';
 const skchar_t kCOLON = ':';
 const skchar_t kCOMMA = ',';
