@@ -77,13 +77,24 @@ void test_process_true21() {
   MY_ASSERT_ON(source.compare(target) == 0);
 }
 
-void test_ignore_true00() {
-  StarOptions options{true, 2, 1};
+void test_ignore_nokey_true00() {
+  StarOptions options{true, 0, 0};
   StarJson engine(options);
   setupNormalEngine(engine);
 
   std::u16string source(u"{\"mobile\":\"12345678\"}");
   std::u16string target(u"{\"mobile\":\"12345678\"}");
+  engine.ProcessBuffer((skchar_t*)source.data(), source.size());
+  MY_ASSERT_ON(source.compare(target) == 0);
+}
+
+void test_ignore_number_true00() {
+  StarOptions options{true, 0, 0};
+  StarJson engine(options);
+  setupNormalEngine(engine);
+
+  std::u16string source(u"{\"phone\":-123457.E23");
+  std::u16string target(u"{\"phone\":-123457.E23");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -104,8 +115,8 @@ void test_process_array_false22() {
   StarJson engine(options);
   setupNormalEngine(engine);
 
-  std::u16string source(u"{\"phone\":[\"12345678\",\"12345678\"]}");
-  std::u16string target(u"{\"phone\":[\"12****78\",\"12****78\"]}");
+  std::u16string source(u"{\"phone\":[\"12345678\",12345678,\"12345678\"]}");
+  std::u16string target(u"{\"phone\":[\"12****78\",12345678,\"12****78\"]}");
   engine.ProcessBuffer((skchar_t*)source.data(), source.size());
   MY_ASSERT_ON(source.compare(target) == 0);
 }
@@ -241,7 +252,8 @@ int main(int argc, char* argv[]) {
   test_process_true11();
   test_process_true00();
   test_process_true21();
-  test_ignore_true00();
+  test_ignore_nokey_true00();
+  test_ignore_number_true00();
   test_process_empty_false22();
   test_process_array_false22();
   test_process_level_false22();
