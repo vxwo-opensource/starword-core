@@ -1,7 +1,7 @@
 #ifndef SKC_BASE_H_
 #define SKC_BASE_H_
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <stdint.h>
 #ifdef SKC_USE_UTF32
 typedef uint32_t skchar_t;
