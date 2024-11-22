@@ -6,11 +6,4 @@ GRTAGS
 Makefile
 CMakeCache.txt
 CMakeFiles/
-Testing/
-x64/
-Debug/
-Release/
-*.dir/
-*.sln
-*.vcxproj
-*.vcxproj.*
+build/
