@@ -108,9 +108,9 @@ void TrieTree::FinishAdd() {
 bool TrieTree::SearchWord(TrieFound &found, const skchar_t *buffer,
                           size_t start_index, size_t stop_index) const {
   bool found_word = false;
-  TrieNode *cursor = root_;
   std::vector<TrieNode *> save_nodes;
-  size_t pos = start_index, save_skip = 0, save_pos = pos;
+  TrieNode *cursor = root_;
+  size_t pos = start_index, save_pos = pos, save_skip = 1;
 
   while (pos < stop_index) {
     auto child = cursor->children.find(transform(ignore_case_, buffer[pos]));
@@ -129,9 +129,9 @@ bool TrieTree::SearchWord(TrieFound &found, const skchar_t *buffer,
       }
 
       cursor = root_;
-      pos = save_pos + (save_skip < 2 ? 1 : save_skip);
-      save_skip = 0;
+      pos = save_pos + save_skip;
       save_pos = pos;
+      save_skip = 1;
     }
   }
 
