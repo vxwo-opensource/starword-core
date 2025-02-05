@@ -1,5 +1,5 @@
-#ifndef SJC_TRIE_TREE_H_
-#define SJC_TRIE_TREE_H_
+#ifndef SKC_TRIE_TREE_H_
+#define SKC_TRIE_TREE_H_
 
 #include "skc_base.h"
 

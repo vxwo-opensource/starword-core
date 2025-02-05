@@ -1,5 +1,5 @@
-#ifndef SJC_STAR_JSON_H_
-#define SJC_STAR_JSON_H_
+#ifndef SKC_STAR_JSON_H_
+#define SKC_STAR_JSON_H_
 
 #include "star_base.h"
 
