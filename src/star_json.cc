@@ -30,10 +30,10 @@ static bool BufferIndexOfStr(size_t& out_index, const skchar_t* buffer,
                              size_t start_index, size_t stop_index,
                              const skchar_t* str, size_t str_start_index,
                              size_t str_stop_index) {
-  skchar_t first_char = str[str_start_index];
-  size_t str_count = str_stop_index - str_start_index;
+  const size_t str_count = str_stop_index - str_start_index;
 
-  size_t last_index = stop_index - str_count;
+  const skchar_t first_char = str[str_start_index];
+  const size_t last_index = stop_index - str_count;
   for (size_t i = start_index; i <= last_index; i++) {
     if (buffer[i] != first_char) {
       while (++i <= last_index && buffer[i] != first_char);
@@ -54,9 +54,9 @@ static bool BufferIndexOfStr(size_t& out_index, const skchar_t* buffer,
   return false;
 }
 
-bool SmartSearchTargetChar(size_t& out_index, const skchar_t* buffer,
-                           skchar_t skip, skchar_t target, size_t start_index,
-                           size_t stop_index) {
+static bool SmartSearchTargetChar(size_t& out_index, const skchar_t* buffer,
+                                  skchar_t skip, skchar_t target,
+                                  size_t start_index, size_t stop_index) {
   if (start_index >= stop_index) {
     return false;
   }
@@ -121,13 +121,13 @@ size_t StarJson::ProcessComplexValue(StarContext& context, skchar_t* buffer,
                                      size_t start_index, size_t stop_index,
                                      bool enter_array) {
   // Skip blank
-  size_t begin_index =
+  const size_t begin_index =
       start_index + BufferSkipChar(buffer, kBLANK, start_index, stop_index);
   if (begin_index >= stop_index) {
     return begin_index;
   }
 
-  skchar_t first_char = buffer[begin_index];
+  const skchar_t first_char = buffer[begin_index];
 
   // Skip OBJECT type
   if (first_char == kLEFT_BRACE) {
@@ -171,7 +171,7 @@ size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
   // Skip NUMBER and SYMBOL
   size_t pos = start_index;
   while (pos < stop_index) {
-    skchar_t ch = buffer[pos];
+    const skchar_t ch = buffer[pos];
     if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') ||
           (ch >= '0' && ch <= '9') || ch == '.' || ch == '-' || ch == '+')) {
       break;
@@ -191,7 +191,7 @@ size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
   }
 
   size_t value_end_index = 0;
-  size_t wrapper_length = value_begin_index - start_index;
+  const size_t wrapper_length = value_begin_index - start_index;
 
   pos = value_begin_index;
   while (pos < stop_index) {
@@ -201,7 +201,7 @@ size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
     }
 
     // Skip escape characters for an odd number of double quotes
-    size_t backslash_count = BufferForwardSkipChar(
+    const size_t backslash_count = BufferForwardSkipChar(
         buffer, kBACKSLASH, value_begin_index, value_end_index - 1);
     if (backslash_count % 2 == 0) {
       break;
