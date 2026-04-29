@@ -13,15 +13,16 @@ struct TrieNode {
   bool is_word;
   size_t skip;
   size_t length;
-  std::unordered_map<skchar_t, struct TrieNode *> children;
+  const void* payload;
+  std::unordered_map<skchar_t, struct TrieNode*> children;
 };
 
-static TrieNode *DigTrieNode(TrieNode *cursor, skchar_t ch) {
+static TrieNode* DigTrieNode(TrieNode* cursor, skchar_t ch) {
   auto it = cursor->children.find(ch);
   if (it != cursor->children.end()) {
     cursor = it->second;
   } else {
-    TrieNode *node = new TrieNode();
+    TrieNode* node = new TrieNode();
     node->is_word = false;
     cursor->children.insert(std::make_pair(ch, node));
     cursor = node;
@@ -34,7 +35,7 @@ TrieTree::TrieTree(bool ignore_case)
     : root_(new TrieNode()), ignore_case_(ignore_case) {}
 
 TrieTree::~TrieTree() {
-  std::stack<TrieNode *> clear_stack;
+  std::stack<TrieNode*> clear_stack;
 
   for (auto it = root_->children.begin(); it != root_->children.end(); ++it) {
     clear_stack.push(it->second);
@@ -42,7 +43,7 @@ TrieTree::~TrieTree() {
   root_->children.clear();
 
   while (!clear_stack.empty()) {
-    TrieNode *node = clear_stack.top();
+    TrieNode* node = clear_stack.top();
     clear_stack.pop();
 
     for (auto it = node->children.begin(); it != node->children.end(); ++it) {
@@ -57,9 +58,9 @@ TrieTree::~TrieTree() {
 
 bool TrieTree::IsEmpty() const { return root_->children.empty(); }
 
-void TrieTree::InsertWord(TrieNode *node, const skchar_t *buffer, size_t length,
-                          size_t extra_length) {
-  TrieNode *cursor = node;
+void TrieTree::InsertWord(TrieNode* node, const skchar_t* buffer, size_t length,
+                          size_t extra_length, const void* payload) {
+  TrieNode* cursor = node;
   for (size_t i = 0; i < length; ++i) {
     cursor = DigTrieNode(cursor, transform(ignore_case_, buffer[i]));
   }
@@ -67,32 +68,35 @@ void TrieTree::InsertWord(TrieNode *node, const skchar_t *buffer, size_t length,
   if (!cursor->is_word) {
     cursor->is_word = true;
     cursor->length = length + extra_length;
+    cursor->payload = payload;
   }
 }
 
-void TrieTree::AddWord(const skchar_t *buffer, size_t length) {
-  InsertWord(root_, buffer, length, 0);
+void TrieTree::AddWord(const skchar_t* buffer, size_t length,
+                       const void* payload) {
+  InsertWord(root_, buffer, length, 0, payload);
 }
 
-void TrieTree::AddWord(skchar_t prefix, const skchar_t *buffer, size_t length) {
-  InsertWord(DigTrieNode(root_, prefix), buffer, length, 1);
+void TrieTree::AddWord(skchar_t prefix, const skchar_t* buffer, size_t length,
+                       const void* payload) {
+  InsertWord(DigTrieNode(root_, prefix), buffer, length, 1, payload);
 }
 
 void TrieTree::FinishAdd() {
-  std::stack<TrieNode *> skip_stack;
+  std::stack<TrieNode*> skip_stack;
 
   for (auto it = root_->children.begin(); it != root_->children.end(); ++it) {
-    TrieNode *node = it->second;
+    TrieNode* node = it->second;
     node->skip = 1;
     skip_stack.push(node);
   }
 
   while (!skip_stack.empty()) {
-    TrieNode *node = skip_stack.top();
+    TrieNode* node = skip_stack.top();
     skip_stack.pop();
 
     for (auto it = node->children.begin(); it != node->children.end(); ++it) {
-      TrieNode *child = it->second;
+      TrieNode* child = it->second;
 
       if (root_->children.find(it->first) != root_->children.end()) {
         child->skip = 1;
@@ -105,11 +109,11 @@ void TrieTree::FinishAdd() {
   }
 }
 
-bool TrieTree::SearchWord(TrieFound &found, const skchar_t *buffer,
+bool TrieTree::SearchWord(TrieFound& found, const skchar_t* buffer,
                           size_t start_index, size_t stop_index) const {
   bool found_word = false;
-  std::vector<TrieNode *> save_nodes;
-  TrieNode *cursor = root_;
+  std::vector<TrieNode*> save_nodes;
+  TrieNode* cursor = root_;
   size_t pos = start_index, save_pos = pos, save_skip = 1;
 
   while (pos < stop_index) {
@@ -139,8 +143,9 @@ bool TrieTree::SearchWord(TrieFound &found, const skchar_t *buffer,
     return false;
   }
 
-  TrieNode *node = save_nodes.back();
+  TrieNode* node = save_nodes.back();
   found.start_index = save_pos;
   found.stop_index = save_pos + node->length;
+  found.payload = node->payload;
   return true;
 }

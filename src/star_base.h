@@ -3,12 +3,18 @@
 
 #include "trie_tree.h"
 
+const skchar_t kNULL = 0x0;
 const skchar_t kSTAR = '*';
 
-struct StarOptions {
-  bool ignore_case;
+struct StarMethod {
   size_t left_border;
   size_t right_border;
+  skchar_t right_border_char;
+};
+
+struct StarStatistics {
+  size_t process_count;
+  size_t character_total;
 };
 
 class StarBase {
@@ -21,19 +27,15 @@ class StarBase {
   virtual void AddWord(const skchar_t* buffer, size_t length);
   virtual bool ProcessBuffer(skchar_t* buffer, size_t length) = 0;
 
+  static bool IsEqMethod(const StarMethod& a, const StarMethod& b);
+  static void StarBuffer(StarStatistics& statistics, skchar_t* buffer,
+                         size_t start_index, size_t stop_index,
+                         const StarMethod& method);
+
  protected:
-  struct StarContext {
-    size_t process_count;
-    size_t character_total;
-  };
-
   TrieTree tree_;
-  StarOptions options_;
 
-  StarBase(const StarOptions& options);
-
-  virtual void StarBuffer(StarContext& context, skchar_t* buffer,
-                          size_t start_index, size_t stop_index);
+  StarBase(bool ignore_case);
 };
 
 #endif

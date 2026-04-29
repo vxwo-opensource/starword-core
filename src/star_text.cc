@@ -1,10 +1,12 @@
 #include "star_text.h"
 
-StarText::StarText(const StarOptions& options) : StarBase(options) {}
+StarText::StarText(const StarTextOptions& options)
+    : StarBase(options.ignore_case),
+      method_{options.left_border, options.right_border, kNULL} {}
 
 bool StarText::ProcessBuffer(skchar_t* buffer, size_t length) {
   TrieFound found{};
-  StarContext context{};
+  StarStatistics statistics{};
 
   size_t pos = 0;
   while (pos < length) {
@@ -13,8 +15,9 @@ bool StarText::ProcessBuffer(skchar_t* buffer, size_t length) {
     }
 
     pos = found.stop_index;
-    StarBuffer(context, buffer, found.start_index, found.stop_index);
+    StarBuffer(statistics, buffer, found.start_index, found.stop_index,
+               method_);
   }
 
-  return context.process_count > 0;
+  return statistics.process_count > 0;
 }

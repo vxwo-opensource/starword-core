@@ -3,23 +3,25 @@
 
 #include "star_base.h"
 
+struct StarJsonOptions {
+  bool ignore_case;
+  StarMethod method;
+};
+
+struct StarJsonLocal;
 class StarJson : public StarBase {
  public:
-  StarJson(const StarOptions& options);
+  StarJson(const StarJsonOptions& options);
+  virtual ~StarJson();
 
   void AddWord(const skchar_t* buffer, size_t length) override;
+  void AddWord(const skchar_t* buffer, size_t length, const StarMethod& method);
+
   bool ProcessBuffer(skchar_t* buffer, size_t length) override;
 
- protected:
-  void StarBuffer(StarContext& context, skchar_t* buffer, size_t start_index,
-                  size_t stop_index) override;
-
  private:
-  size_t ProcessComplexValue(StarContext& context, skchar_t* buffer,
-                             size_t start_index, size_t stop_index,
-                             bool enter_array);
-  size_t ProcessSimpleValue(StarContext& context, skchar_t* buffer,
-                            size_t start_index, size_t stop_index);
+  StarMethod method_;
+  StarJsonLocal* local_;
 };
 
 #endif

@@ -1,5 +1,7 @@
 #include "star_json.h"
 
+#include <vector>
+
 const skchar_t kBLANK = ' ';
 const skchar_t kCOLON = ':';
 const skchar_t kCOMMA = ',';
@@ -77,97 +79,27 @@ static bool SmartSearchTargetChar(size_t& out_index, const skchar_t* buffer,
   return true;
 }
 
-StarJson::StarJson(const StarOptions& options) : StarBase(options) {}
+static void StarJsonBuffer(StarStatistics& statistics, skchar_t* buffer,
+                           size_t start_index, size_t stop_index,
+                           const StarMethod& method) {
+  if (start_index > 0 && buffer[start_index - 1] == kBACKSLASH &&
+      BufferForwardSkipChar(buffer, kBACKSLASH, 0, start_index - 1) % 2 != 0) {
+    start_index += 1;
+  }
 
-void StarJson::AddWord(const skchar_t* buffer, size_t length) {
-  tree_.AddWord(kDOUBLE_QUOTE, buffer, length);
+  if (stop_index > 0 && buffer[stop_index - 1] == kBACKSLASH &&
+      BufferForwardSkipChar(buffer, kBACKSLASH, start_index, stop_index - 1) %
+              2 !=
+          0) {
+    stop_index -= 1;
+  }
+
+  StarBase::StarBuffer(statistics, buffer, start_index, stop_index, method);
 }
 
-bool StarJson::ProcessBuffer(skchar_t* buffer, size_t length) {
-  TrieFound found{};
-  StarContext context{};
-
-  size_t pos = 0;
-  while (pos < length) {
-    // Find the KEY prefix
-    if (!tree_.SearchWord(found, buffer, pos, length) ||
-        found.stop_index >= length) {
-      break;
-    }
-
-    // Find the KEY suffix
-    size_t key_next_index = 0;
-    if (!SmartSearchTargetChar(key_next_index, buffer, kBACKSLASH,
-                               kDOUBLE_QUOTE, found.stop_index, length)) {
-      pos = found.stop_index;
-      continue;
-    }
-
-    // Find the KEY/VALUE separator
-    size_t colon_next_index = 0;
-    if (!SmartSearchTargetChar(colon_next_index, buffer, kBLANK, kCOLON,
-                               key_next_index, length)) {
-      pos = key_next_index;
-      continue;
-    }
-
-    pos = ProcessComplexValue(context, buffer, colon_next_index, length, true);
-  }
-
-  return context.process_count > 0;
-}
-
-size_t StarJson::ProcessComplexValue(StarContext& context, skchar_t* buffer,
-                                     size_t start_index, size_t stop_index,
-                                     bool enter_array) {
-  // Skip blank
-  const size_t begin_index =
-      start_index + BufferSkipChar(buffer, kBLANK, start_index, stop_index);
-  if (begin_index >= stop_index) {
-    return begin_index;
-  }
-
-  const skchar_t first_char = buffer[begin_index];
-
-  // Skip OBJECT type
-  if (first_char == kLEFT_BRACE) {
-    return begin_index + 1;
-  }
-
-  // Process simple types
-  if (first_char != kLEFT_BRACKET) {
-    return ProcessSimpleValue(context, buffer, begin_index, stop_index);
-  }
-
-  // Skipping ARRAY nesting
-  if (!enter_array) {
-    return begin_index + 1;
-  }
-
-  size_t pos = begin_index + 1;
-  while (pos < stop_index) {
-    size_t next_index =
-        ProcessComplexValue(context, buffer, pos, stop_index, false);
-
-    // Skip blank
-    next_index += BufferSkipChar(buffer, kBLANK, next_index, stop_index);
-    if (next_index >= stop_index) {
-      pos = next_index;
-      break;
-    }
-
-    pos = next_index + 1;
-
-    // Find the ARRAY separator
-    if (buffer[next_index] != kCOMMA) {
-      break;
-    }
-  }
-  return pos;
-}
-
-size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
-                                    size_t start_index, size_t stop_index) {
+static size_t ProcessSimpleValue(StarStatistics& statistics, skchar_t* buffer,
+                                 size_t start_index, size_t stop_index,
+                                 const StarMethod& method) {
   // Skip NUMBER and SYMBOL
   size_t pos = start_index;
   while (pos < stop_index) {
@@ -216,25 +148,132 @@ size_t StarJson::ProcessSimpleValue(StarContext& context, skchar_t* buffer,
   }
 
   if (value_end_index > value_begin_index) {
-    StarBuffer(context, buffer, value_begin_index, value_end_index);
+    StarJsonBuffer(statistics, buffer, value_begin_index, value_end_index,
+                   method);
   }
 
   return value_end_index + wrapper_length;
 }
 
-void StarJson::StarBuffer(StarContext& context, skchar_t* buffer,
-                          size_t start_index, size_t stop_index) {
-  if (start_index > 0 && buffer[start_index - 1] == kBACKSLASH &&
-      BufferForwardSkipChar(buffer, kBACKSLASH, 0, start_index - 1) % 2 != 0) {
-    start_index += 1;
+static size_t ProcessComplexValue(StarStatistics& statistics, skchar_t* buffer,
+                                  size_t start_index, size_t stop_index,
+                                  bool enter_array, const StarMethod& method) {
+  // Skip blank
+  const size_t begin_index =
+      start_index + BufferSkipChar(buffer, kBLANK, start_index, stop_index);
+  if (begin_index >= stop_index) {
+    return begin_index;
   }
 
-  if (stop_index > 0 && buffer[stop_index - 1] == kBACKSLASH &&
-      BufferForwardSkipChar(buffer, kBACKSLASH, start_index, stop_index - 1) %
-              2 !=
-          0) {
-    stop_index -= 1;
+  const skchar_t first_char = buffer[begin_index];
+
+  // Skip OBJECT type
+  if (first_char == kLEFT_BRACE) {
+    return begin_index + 1;
   }
 
-  StarBase::StarBuffer(context, buffer, start_index, stop_index);
+  // Process simple types
+  if (first_char != kLEFT_BRACKET) {
+    return ProcessSimpleValue(statistics, buffer, begin_index, stop_index,
+                              method);
+  }
+
+  // Skipping ARRAY nesting
+  if (!enter_array) {
+    return begin_index + 1;
+  }
+
+  size_t pos = begin_index + 1;
+  while (pos < stop_index) {
+    size_t next_index =
+        ProcessComplexValue(statistics, buffer, pos, stop_index, false, method);
+
+    // Skip blank
+    next_index += BufferSkipChar(buffer, kBLANK, next_index, stop_index);
+    if (next_index >= stop_index) {
+      pos = next_index;
+      break;
+    }
+
+    pos = next_index + 1;
+
+    // Find the ARRAY separator
+    if (buffer[next_index] != kCOMMA) {
+      break;
+    }
+  }
+  return pos;
+}
+
+struct StarJsonLocal {
+  std::vector<StarMethod*> methods;
+};
+
+StarJson::StarJson(const StarJsonOptions& options)
+    : StarBase(options.ignore_case),
+      method_(options.method),
+      local_(new StarJsonLocal()) {}
+
+StarJson::~StarJson() {
+  for (struct StarMethod* method : local_->methods) {
+    delete method;
+  }
+}
+
+void StarJson::AddWord(const skchar_t* buffer, size_t length) {
+  tree_.AddWord(kDOUBLE_QUOTE, buffer, length, nullptr);
+}
+
+void StarJson::AddWord(const skchar_t* buffer, size_t length,
+                       const StarMethod& method) {
+  StarMethod* target = nullptr;
+  for (StarMethod* exists : local_->methods) {
+    if (IsEqMethod(*exists, method)) {
+      target = exists;
+      break;
+    }
+  }
+  if (target == nullptr) {
+    target = new StarMethod(method);
+    local_->methods.push_back(target);
+  }
+
+  tree_.AddWord(kDOUBLE_QUOTE, buffer, length, target);
+}
+
+bool StarJson::ProcessBuffer(skchar_t* buffer, size_t length) {
+  TrieFound found{};
+  StarStatistics statistics{};
+
+  size_t pos = 0;
+  while (pos < length) {
+    // Find the KEY prefix
+    if (!tree_.SearchWord(found, buffer, pos, length) ||
+        found.stop_index >= length) {
+      break;
+    }
+
+    // Find the KEY suffix
+    size_t key_next_index = 0;
+    if (!SmartSearchTargetChar(key_next_index, buffer, kBACKSLASH,
+                               kDOUBLE_QUOTE, found.stop_index, length)) {
+      pos = found.stop_index;
+      continue;
+    }
+
+    // Find the KEY/VALUE separator
+    size_t colon_next_index = 0;
+    if (!SmartSearchTargetChar(colon_next_index, buffer, kBLANK, kCOLON,
+                               key_next_index, length)) {
+      pos = key_next_index;
+      continue;
+    }
+
+    const StarMethod* method =
+        found.payload == nullptr ? &method_ : (const StarMethod*)found.payload;
+    pos = ProcessComplexValue(statistics, buffer, colon_next_index, length,
+                              true, *method);
+  }
+
+  return statistics.process_count > 0;
 }

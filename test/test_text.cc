@@ -13,7 +13,7 @@ void setupNormalEngine(StarText& engine) {
 }
 
 void test_process_false22() {
-  StarOptions options{false, 2, 2};
+  StarTextOptions options{false, 2, 2};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -24,7 +24,7 @@ void test_process_false22() {
 }
 
 void test_process_false20() {
-  StarOptions options{false, 2, 0};
+  StarTextOptions options{false, 2, 0};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -35,7 +35,7 @@ void test_process_false20() {
 }
 
 void test_process_false02() {
-  StarOptions options{false, 0, 2};
+  StarTextOptions options{false, 0, 2};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -46,7 +46,7 @@ void test_process_false02() {
 }
 
 void test_process_true11() {
-  StarOptions options{true, 1, 1};
+  StarTextOptions options{true, 1, 1};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -57,7 +57,7 @@ void test_process_true11() {
 }
 
 void test_process_true00() {
-  StarOptions options{true, 0, 0};
+  StarTextOptions options{true, 0, 0};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -68,7 +68,7 @@ void test_process_true00() {
 }
 
 void test_process_true21() {
-  StarOptions options{true, 2, 1};
+  StarTextOptions options{true, 2, 1};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -79,7 +79,7 @@ void test_process_true21() {
 }
 
 void test_ignore_true00() {
-  StarOptions options{true, 0, 0};
+  StarTextOptions options{true, 0, 0};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -90,7 +90,7 @@ void test_ignore_true00() {
 }
 
 void test_process_utf16_4bytes_middle_fasle00() {
-  StarOptions options{false, 0, 0};
+  StarTextOptions options{false, 0, 0};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -101,7 +101,7 @@ void test_process_utf16_4bytes_middle_fasle00() {
 }
 
 void test_process_utf16_4bytes_before_fasle10() {
-  StarOptions options{false, 1, 0};
+  StarTextOptions options{false, 1, 0};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -112,7 +112,7 @@ void test_process_utf16_4bytes_before_fasle10() {
 }
 
 void test_process_utf16_4bytes_after_fasle01() {
-  StarOptions options{false, 0, 1};
+  StarTextOptions options{false, 0, 1};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -123,7 +123,7 @@ void test_process_utf16_4bytes_after_fasle01() {
 }
 
 void test_skip_length_sample() {
-  StarOptions options{false, 0, 0};
+  StarTextOptions options{false, 0, 0};
   StarText engine(options);
   setupNormalEngine(engine);
 
@@ -148,7 +148,7 @@ void test_skip_length_complex() {
   const std::u16string word_short2(u"abcd");
   const std::u16string word_long(u"abcdefg");
 
-  StarOptions options{false, 0, 0};
+  StarTextOptions options{false, 0, 0};
   StarText engine(options);
   engine.AddWord((skchar_t*)word_short1.data(), word_short1.size());
   engine.AddWord((skchar_t*)word_short2.data(), word_short2.size());

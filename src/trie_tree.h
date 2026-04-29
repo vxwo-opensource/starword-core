@@ -6,6 +6,7 @@
 struct TrieFound {
   size_t start_index;
   size_t stop_index;
+  const void* payload;
 };
 
 struct TrieNode;
@@ -16,8 +17,9 @@ class TrieTree final {
 
   bool IsEmpty() const;
 
-  void AddWord(const skchar_t* buffer, size_t length);
-  void AddWord(skchar_t prefix, const skchar_t* buffer, size_t length);
+  void AddWord(const skchar_t* buffer, size_t length, const void* payload);
+  void AddWord(skchar_t prefix, const skchar_t* buffer, size_t length,
+               const void* payload);
   void FinishAdd();
 
   bool SearchWord(TrieFound& found, const skchar_t* buffer, size_t start_index,
@@ -28,7 +30,7 @@ class TrieTree final {
   bool ignore_case_;
 
   void InsertWord(TrieNode* node, const skchar_t* buffer, size_t length,
-                  size_t extra_length);
+                  size_t extra_length, const void* payload);
 };
 
 #endif

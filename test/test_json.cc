@@ -11,7 +11,7 @@ void setupNormalEngine(StarJson& engine) {
 }
 
 void test_process_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -22,7 +22,7 @@ void test_process_false22() {
 }
 
 void test_process_false20() {
-  StarOptions options{false, 2, 0};
+  StarJsonOptions options{false, {2, 0}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -33,7 +33,7 @@ void test_process_false20() {
 }
 
 void test_process_false02() {
-  StarOptions options{false, 0, 2};
+  StarJsonOptions options{false, {0, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -44,7 +44,7 @@ void test_process_false02() {
 }
 
 void test_process_true11() {
-  StarOptions options{true, 1, 1};
+  StarJsonOptions options{true, {1, 1}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -55,7 +55,7 @@ void test_process_true11() {
 }
 
 void test_process_true00() {
-  StarOptions options{true, 0, 0};
+  StarJsonOptions options{true, {0, 0}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -66,7 +66,7 @@ void test_process_true00() {
 }
 
 void test_process_true21() {
-  StarOptions options{true, 2, 1};
+  StarJsonOptions options{true, {2, 1}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -78,7 +78,7 @@ void test_process_true21() {
 }
 
 void test_ignore_nokey_true00() {
-  StarOptions options{true, 0, 0};
+  StarJsonOptions options{true, {0, 0}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -89,7 +89,7 @@ void test_ignore_nokey_true00() {
 }
 
 void test_ignore_number_true00() {
-  StarOptions options{true, 0, 0};
+  StarJsonOptions options{true, {0, 0}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -100,7 +100,7 @@ void test_ignore_number_true00() {
 }
 
 void test_process_empty_false22() {
-  StarOptions options{true, 2, 2};
+  StarJsonOptions options{true, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -111,7 +111,7 @@ void test_process_empty_false22() {
 }
 
 void test_process_array_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -122,7 +122,7 @@ void test_process_array_false22() {
 }
 
 void test_process_level_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -133,7 +133,7 @@ void test_process_level_false22() {
 }
 
 void test_process_multiple_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -164,7 +164,7 @@ void test_process_multiple_false22() {
 }
 
 void test_process_inline_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -175,7 +175,7 @@ void test_process_inline_false22() {
 }
 
 void test_process_escape_double_quote_first_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -186,7 +186,7 @@ void test_process_escape_double_quote_first_false22() {
 }
 
 void test_process_escape_double_quote_middle_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -197,7 +197,7 @@ void test_process_escape_double_quote_middle_false22() {
 }
 
 void test_process_escape_double_quote_end_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -208,7 +208,7 @@ void test_process_escape_double_quote_end_false22() {
 }
 
 void test_process_escape_back_slash_on_end_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -219,7 +219,7 @@ void test_process_escape_back_slash_on_end_false22() {
 }
 
 void test_process_escape_back_slash_only_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -230,7 +230,7 @@ void test_process_escape_back_slash_only_false22() {
 }
 
 void test_process_escape_inline_false22() {
-  StarOptions options{false, 2, 2};
+  StarJsonOptions options{false, {2, 2}};
   StarJson engine(options);
   setupNormalEngine(engine);
 
@@ -243,6 +243,39 @@ void test_process_escape_inline_false22() {
   std::u16string target2(u"{\"mobile\": \"{\\\"phone\\\":\\\"12****78\\\"}\"}");
   engine.ProcessBuffer((skchar_t*)source2.data(), source2.size());
   MY_ASSERT_ON(source2.compare(target2) == 0);
+}
+
+void test_process_false22_and_email21() {
+  std::u16string word_email1(u"email");
+  std::u16string word_email2(u"userEmail");
+
+  StarJsonOptions options{false, {2, 2}};
+  StarJson engine(options);
+  engine.AddWord((skchar_t*)word_email1.data(), word_email1.size(),
+                 {2, 1, u'@'});
+  engine.AddWord((skchar_t*)word_email2.data(), word_email2.size(),
+                 {2, 1, u'@'});
+  setupNormalEngine(engine);
+
+  std::u16string source1(u"{\"phone\":\"12345678\"}");
+  std::u16string target1(u"{\"phone\":\"12****78\"}");
+  engine.ProcessBuffer((skchar_t*)source1.data(), source1.size());
+  MY_ASSERT_ON(source1.compare(target1) == 0);
+
+  std::u16string source2(u"{\"email\":\"12345678@example.com\"}");
+  std::u16string target2(u"{\"email\":\"12*****8@example.com\"}");
+  engine.ProcessBuffer((skchar_t*)source2.data(), source2.size());
+  MY_ASSERT_ON(source2.compare(target2) == 0);
+
+  std::u16string source3(u"{\"userEmail\":\"@example.com\"}");
+  std::u16string target3(u"{\"userEmail\":\"@example.com\"}");
+  engine.ProcessBuffer((skchar_t*)source3.data(), source3.size());
+  MY_ASSERT_ON(source3.compare(target3) == 0);
+
+  std::u16string source4(u"{\"userEmail\":\"12345678\"}");
+  std::u16string target4(u"{\"userEmail\":\"12*****8\"}");
+  engine.ProcessBuffer((skchar_t*)source4.data(), source4.size());
+  MY_ASSERT_ON(source4.compare(target4) == 0);
 }
 
 int main(int argc, char* argv[]) {
@@ -265,6 +298,8 @@ int main(int argc, char* argv[]) {
   test_process_escape_back_slash_on_end_false22();
   test_process_escape_back_slash_only_false22();
   test_process_escape_inline_false22();
+
+  test_process_false22_and_email21();
 
   return MY_ASSERT_RESULT();
 }

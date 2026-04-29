@@ -4,8 +4,7 @@ static inline bool IsUtf16Surrogate(skchar_t v) {
   return v >= 0xD800 && v <= 0xDFFF;
 }
 
-StarBase::StarBase(const StarOptions& options)
-    : tree_(options.ignore_case), options_(options) {}
+StarBase::StarBase(bool ignore_case) : tree_(ignore_case) {}
 StarBase::~StarBase() {}
 
 bool StarBase::IsEmpty() const { return tree_.IsEmpty(); }
@@ -13,17 +12,38 @@ bool StarBase::IsEmpty() const { return tree_.IsEmpty(); }
 void StarBase::FinishAdd() { tree_.FinishAdd(); }
 
 void StarBase::AddWord(const skchar_t* buffer, size_t length) {
-  tree_.AddWord(buffer, length);
+  tree_.AddWord(buffer, length, nullptr);
 }
 
-void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
-                          size_t start_index, size_t stop_index) {
+bool StarBase::IsEqMethod(const StarMethod& a, const StarMethod& b) {
+  return a.left_border == b.left_border && a.right_border == b.right_border &&
+         a.right_border_char == b.right_border_char;
+}
+
+void StarBase::StarBuffer(StarStatistics& statistics, skchar_t* buffer,
+                          size_t start_index, size_t stop_index,
+                          const StarMethod& method) {
+  if (method.right_border_char != kNULL) {
+    bool found = false;
+    size_t op = stop_index;
+    while (op > start_index) {
+      op -= 1;
+      if (buffer[op] == method.right_border_char) {
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      stop_index = op;
+    }
+  }
+
   size_t effective = stop_index - start_index;
   if (effective < 1) {
     return;
   }
 
-  size_t left_border = options_.left_border;
+  size_t left_border = method.left_border;
   if (left_border >= effective) {
     left_border = effective - 1;
   }
@@ -34,7 +54,7 @@ void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
   }
 #endif
 
-  size_t right_border = options_.right_border;
+  size_t right_border = method.right_border;
   if (right_border >= effective - left_border) {
     right_border = 0;
   }
@@ -57,8 +77,8 @@ void StarBase::StarBuffer(StarContext& context, skchar_t* buffer,
     return;
   }
 
-  context.process_count += 1;
-  context.character_total += effective;
+  statistics.process_count += 1;
+  statistics.character_total += effective;
 
   size_t pos = start_index;
   while (pos + 4 < stop_index) {
