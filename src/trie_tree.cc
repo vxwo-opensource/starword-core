@@ -105,11 +105,14 @@ void TrieTree::AddWord(skchar_t prefix, const skchar_t* buffer, size_t length,
 
 void TrieTree::FinishAdd() {
   std::stack<TrieNode*> skip_stack;
+  std::unordered_set<const TrieNode*> seen;
 
   for (auto it = root_->children.begin(); it != root_->children.end(); ++it) {
     TrieNode* node = it->second;
-    node->skip = 1;
-    skip_stack.push(node);
+    if (seen.insert(node).second) {
+      node->skip = 1;
+      skip_stack.push(node);
+    }
   }
 
   while (!skip_stack.empty()) {
@@ -118,6 +121,9 @@ void TrieTree::FinishAdd() {
 
     for (auto it = node->children.begin(); it != node->children.end(); ++it) {
       TrieNode* child = it->second;
+      if (!seen.insert(child).second) {
+        continue;
+      }
 
       if (root_->children.find(it->first) != root_->children.end()) {
         child->skip = 1;
