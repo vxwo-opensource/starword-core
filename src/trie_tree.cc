@@ -15,10 +15,10 @@ struct TrieNode {
   TrieNode(TrieNode&&) = delete;
   TrieNode& operator=(TrieNode&&) = delete;
 
-  bool is_word;
-  size_t skip;
-  size_t length;
-  const void* payload;
+  bool is_word = false;
+  size_t skip = 0;
+  size_t length = 0;
+  const void* payload = nullptr;
   std::unordered_map<skchar_t, struct TrieNode*> children;
 };
 
