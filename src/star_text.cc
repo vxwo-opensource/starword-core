@@ -15,8 +15,8 @@ bool StarText::ProcessBuffer(skchar_t* buffer, size_t length) {
     }
 
     pos = found.stop_index;
-    StarBuffer(statistics, buffer, found.start_index, found.stop_index,
-               method_);
+    StarPartialBuffer(statistics, buffer, found.start_index, found.stop_index,
+                      method_);
   }
 
   return statistics.process_count > 0;

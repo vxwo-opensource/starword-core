@@ -27,20 +27,22 @@ class StarBase {
   virtual void AddWord(const skchar_t* buffer, size_t length);
   virtual bool ProcessBuffer(skchar_t* buffer, size_t length) = 0;
 
-  static bool IsEqMethod(const StarMethod& a, const StarMethod& b);
-  static void StarBuffer(StarStatistics& statistics, skchar_t* buffer,
-                         size_t start_index, size_t stop_index,
-                         const StarMethod& method);
-
-  StarBase(const StarBase&) = delete;
-  StarBase& operator=(const StarBase&) = delete;
-  StarBase(StarBase&&) = delete;
-  StarBase& operator=(StarBase&&) = delete;
+  static bool ProcessBuffer(skchar_t* buffer, size_t length,
+                            const StarMethod& method);
 
  protected:
   TrieTree tree_;
 
   StarBase(bool ignore_case);
+  StarBase(const StarBase&) = delete;
+  StarBase& operator=(const StarBase&) = delete;
+  StarBase(StarBase&&) = delete;
+  StarBase& operator=(StarBase&&) = delete;
+
+  static bool IsMethodEqual(const StarMethod& a, const StarMethod& b);
+  static void StarPartialBuffer(StarStatistics& statistics, skchar_t* buffer,
+                                size_t start_index, size_t stop_index,
+                                const StarMethod& method);
 };
 
 #endif

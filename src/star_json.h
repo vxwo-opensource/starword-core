@@ -22,6 +22,18 @@ class StarJson : public StarBase {
  private:
   StarMethod method_;
   StarJsonLocal* local_;
+
+  static size_t ProcessSimpleValue(StarStatistics& statistics, skchar_t* buffer,
+                                   size_t start_index, size_t stop_index,
+                                   const StarMethod& method);
+  static size_t ProcessComplexValue(StarStatistics& statistics,
+                                    skchar_t* buffer, size_t start_index,
+                                    size_t stop_index, bool enter_array,
+                                    const StarMethod& method);
+  static void StarJsonPartialBuffer(StarStatistics& statistics,
+                                    skchar_t* buffer, size_t start_index,
+                                    size_t stop_index,
+                                    const StarMethod& method);
 };
 
 #endif

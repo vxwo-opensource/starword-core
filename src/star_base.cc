@@ -15,14 +15,23 @@ void StarBase::AddWord(const skchar_t* buffer, size_t length) {
   tree_.AddWord(buffer, length, nullptr);
 }
 
-bool StarBase::IsEqMethod(const StarMethod& a, const StarMethod& b) {
+bool StarBase::IsMethodEqual(const StarMethod& a, const StarMethod& b) {
   return a.left_border == b.left_border && a.right_border == b.right_border &&
          a.right_border_char == b.right_border_char;
 }
 
-void StarBase::StarBuffer(StarStatistics& statistics, skchar_t* buffer,
-                          size_t start_index, size_t stop_index,
-                          const StarMethod& method) {
+bool StarBase::ProcessBuffer(skchar_t* buffer, size_t length,
+                             const StarMethod& method) {
+  StarStatistics statistics{};
+
+  StarPartialBuffer(statistics, buffer, 0, length, method);
+
+  return statistics.process_count > 0;
+}
+
+void StarBase::StarPartialBuffer(StarStatistics& statistics, skchar_t* buffer,
+                                 size_t start_index, size_t stop_index,
+                                 const StarMethod& method) {
   if (method.right_border_char != kNULL) {
     bool found = false;
     size_t op = stop_index;
