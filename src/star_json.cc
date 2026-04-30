@@ -218,6 +218,7 @@ StarJson::~StarJson() {
   for (struct StarMethod* method : local_->methods) {
     delete method;
   }
+  delete local_;
 }
 
 void StarJson::AddWord(const skchar_t* buffer, size_t length) {

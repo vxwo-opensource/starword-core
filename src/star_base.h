@@ -32,6 +32,9 @@ class StarBase {
                          size_t start_index, size_t stop_index,
                          const StarMethod& method);
 
+  StarBase(const StarBase&) = delete;
+  StarBase& operator=(const StarBase&) = delete;
+
  protected:
   TrieTree tree_;
 
