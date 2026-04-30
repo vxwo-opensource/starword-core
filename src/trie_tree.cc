@@ -9,6 +9,12 @@ static inline bool IsAsciiUpper(skchar_t ch) { return ch >= 'A' && ch <= 'Z'; }
 static inline bool IsAsciiLower(skchar_t ch) { return ch >= 'a' && ch <= 'z'; }
 
 struct TrieNode {
+  TrieNode() = default;
+  TrieNode(const TrieNode&) = delete;
+  TrieNode& operator=(const TrieNode&) = delete;
+  TrieNode(TrieNode&&) = delete;
+  TrieNode& operator=(TrieNode&&) = delete;
+
   bool is_word;
   size_t skip;
   size_t length;

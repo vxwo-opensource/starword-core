@@ -15,6 +15,11 @@ class TrieTree final {
   TrieTree(bool ignore_case);
   ~TrieTree();
 
+  TrieTree(const TrieTree&) = delete;
+  TrieTree& operator=(const TrieTree&) = delete;
+  TrieTree(TrieTree&&) = delete;
+  TrieTree& operator=(TrieTree&&) = delete;
+
   bool IsEmpty() const;
 
   void AddWord(const skchar_t* buffer, size_t length, const void* payload);

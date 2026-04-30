@@ -34,6 +34,8 @@ class StarBase {
 
   StarBase(const StarBase&) = delete;
   StarBase& operator=(const StarBase&) = delete;
+  StarBase(StarBase&&) = delete;
+  StarBase& operator=(StarBase&&) = delete;
 
  protected:
   TrieTree tree_;

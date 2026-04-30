@@ -206,6 +206,12 @@ static size_t ProcessComplexValue(StarStatistics& statistics, skchar_t* buffer,
 }
 
 struct StarJsonLocal {
+  StarJsonLocal() = default;
+  StarJsonLocal(const StarJsonLocal&) = delete;
+  StarJsonLocal& operator=(const StarJsonLocal&) = delete;
+  StarJsonLocal(StarJsonLocal&&) = delete;
+  StarJsonLocal& operator=(StarJsonLocal&&) = delete;
+
   std::vector<StarMethod*> methods;
 };
 
