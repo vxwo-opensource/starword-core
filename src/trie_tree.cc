@@ -2,12 +2,11 @@
 
 #include <stack>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
-static inline skchar_t transform(bool ignore, skchar_t value) {
-  return !ignore ? value
-                 : ((value >= 'A' && value <= 'Z') ? (value + 0x20) : value);
-}
+static inline bool IsAsciiUpper(skchar_t ch) { return ch >= 'A' && ch <= 'Z'; }
+static inline bool IsAsciiLower(skchar_t ch) { return ch >= 'a' && ch <= 'z'; }
 
 struct TrieNode {
   bool is_word;
@@ -17,18 +16,25 @@ struct TrieNode {
   std::unordered_map<skchar_t, struct TrieNode*> children;
 };
 
-static TrieNode* DigTrieNode(TrieNode* cursor, skchar_t ch) {
+static TrieNode* DigTrieNode(TrieNode* cursor, skchar_t ch, bool ignore_case) {
+  TrieNode* child = nullptr;
   auto it = cursor->children.find(ch);
   if (it != cursor->children.end()) {
-    cursor = it->second;
+    child = it->second;
   } else {
-    TrieNode* node = new TrieNode();
-    node->is_word = false;
-    cursor->children.insert(std::make_pair(ch, node));
-    cursor = node;
+    child = new TrieNode();
+    child->is_word = false;
+    cursor->children.insert(std::make_pair(ch, child));
   }
 
-  return cursor;
+  if (ignore_case && (IsAsciiUpper(ch) || IsAsciiLower(ch))) {
+    skchar_t other = IsAsciiUpper(ch) ? (ch + 0x20) : (ch - 0x20);
+    if (cursor->children.find(other) == cursor->children.end()) {
+      cursor->children.insert(std::make_pair(other, child));
+    }
+  }
+
+  return child;
 }
 
 TrieTree::TrieTree(bool ignore_case)
@@ -36,9 +42,13 @@ TrieTree::TrieTree(bool ignore_case)
 
 TrieTree::~TrieTree() {
   std::stack<TrieNode*> clear_stack;
+  std::unordered_set<const TrieNode*> seen;
 
   for (auto it = root_->children.begin(); it != root_->children.end(); ++it) {
-    clear_stack.push(it->second);
+    TrieNode* node = it->second;
+    if (seen.insert(node).second) {
+      clear_stack.push(node);
+    }
   }
   root_->children.clear();
 
@@ -47,12 +57,16 @@ TrieTree::~TrieTree() {
     clear_stack.pop();
 
     for (auto it = node->children.begin(); it != node->children.end(); ++it) {
-      clear_stack.push(it->second);
+      TrieNode* child = it->second;
+      if (seen.insert(child).second) {
+        clear_stack.push(child);
+      }
     }
     node->children.clear();
     delete node;
   }
 
+  seen.clear();
   delete root_;
 }
 
@@ -62,7 +76,7 @@ void TrieTree::InsertWord(TrieNode* node, const skchar_t* buffer, size_t length,
                           size_t extra_length, const void* payload) {
   TrieNode* cursor = node;
   for (size_t i = 0; i < length; ++i) {
-    cursor = DigTrieNode(cursor, transform(ignore_case_, buffer[i]));
+    cursor = DigTrieNode(cursor, buffer[i], ignore_case_);
   }
 
   if (!cursor->is_word) {
@@ -79,7 +93,8 @@ void TrieTree::AddWord(const skchar_t* buffer, size_t length,
 
 void TrieTree::AddWord(skchar_t prefix, const skchar_t* buffer, size_t length,
                        const void* payload) {
-  InsertWord(DigTrieNode(root_, prefix), buffer, length, 1, payload);
+  InsertWord(DigTrieNode(root_, prefix, ignore_case_), buffer, length, 1,
+             payload);
 }
 
 void TrieTree::FinishAdd() {
@@ -117,7 +132,7 @@ bool TrieTree::SearchWord(TrieFound& found, const skchar_t* buffer,
   size_t pos = start_index, save_pos = pos, save_skip = 1;
 
   while (pos < stop_index) {
-    auto child = cursor->children.find(transform(ignore_case_, buffer[pos]));
+    auto child = cursor->children.find(buffer[pos]);
     if (child != cursor->children.end()) {
       ++pos;
       cursor = child->second;
