@@ -20,13 +20,13 @@ static size_t BufferSkipChar(const skchar_t* buffer, skchar_t ch,
 }
 
 static size_t BufferForwardSkipChar(const skchar_t* buffer, skchar_t ch,
-                                    size_t start_index, size_t stop_index) {
-  size_t pos = stop_index;
-  size_t min_index = start_index == 0 ? 1 : start_index;
+                                    size_t first_index, size_t last_index) {
+  size_t pos = last_index;
+  size_t min_index = first_index == 0 ? 1 : first_index;
   while (pos >= min_index && buffer[pos] == ch) {
     --pos;
   }
-  return stop_index - pos;
+  return last_index - pos;
 }
 
 static bool BufferIndexOfStr(size_t& out_index, const skchar_t* buffer,
