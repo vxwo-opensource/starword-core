@@ -3,10 +3,6 @@
 #include <stack>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
-
-static inline bool IsAsciiUpper(skchar_t ch) { return ch >= 'A' && ch <= 'Z'; }
-static inline bool IsAsciiLower(skchar_t ch) { return ch >= 'a' && ch <= 'z'; }
 
 struct TrieNode {
   TrieNode() = default;
@@ -16,8 +12,8 @@ struct TrieNode {
   TrieNode& operator=(TrieNode&&) = delete;
 
   bool is_word = false;
-  size_t skip = 0;
-  size_t length = 0;
+  uint16_t skip = 0;
+  uint16_t length = 0;
   const void* payload = nullptr;
   std::unordered_map<skchar_t, struct TrieNode*> children;
 };
@@ -33,8 +29,8 @@ static TrieNode* DigTrieNode(TrieNode* cursor, skchar_t ch, bool ignore_case) {
     cursor->children.insert(std::make_pair(ch, child));
   }
 
-  if (ignore_case && (IsAsciiUpper(ch) || IsAsciiLower(ch))) {
-    skchar_t other = IsAsciiUpper(ch) ? (ch + 0x20) : (ch - 0x20);
+  if (ignore_case && ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'))) {
+    skchar_t other = ch ^ 0x20;
     if (cursor->children.find(other) == cursor->children.end()) {
       cursor->children.insert(std::make_pair(other, child));
     }
@@ -138,9 +134,8 @@ void TrieTree::FinishAdd() {
 
 bool TrieTree::SearchWord(TrieFound& found, const skchar_t* buffer,
                           size_t start_index, size_t stop_index) const {
-  bool found_word = false;
-  std::vector<TrieNode*> save_nodes;
   TrieNode* cursor = root_;
+  TrieNode* last_match = nullptr;
   size_t pos = start_index, save_pos = pos, save_skip = 1;
 
   while (pos < stop_index) {
@@ -151,11 +146,10 @@ bool TrieTree::SearchWord(TrieFound& found, const skchar_t* buffer,
 
       save_skip = cursor->skip;
       if (cursor->is_word) {
-        found_word = true;
-        save_nodes.push_back(cursor);
+        last_match = cursor;
       }
     } else {
-      if (found_word) {
+      if (last_match) {
         break;
       }
 
@@ -166,13 +160,12 @@ bool TrieTree::SearchWord(TrieFound& found, const skchar_t* buffer,
     }
   }
 
-  if (!found_word) {
+  if (!last_match) {
     return false;
   }
 
-  TrieNode* node = save_nodes.back();
   found.start_index = save_pos;
-  found.stop_index = save_pos + node->length;
-  found.payload = node->payload;
+  found.stop_index = save_pos + last_match->length;
+  found.payload = last_match->payload;
   return true;
 }
