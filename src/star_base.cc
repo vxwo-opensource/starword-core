@@ -1,7 +1,7 @@
 #include "star_base.h"
 
-static inline bool IsUtf16Surrogate(skchar_t v) {
-  return v >= 0xD800 && v <= 0xDFFF;
+static inline bool IsUtf16LowSurrogate(skchar_t v) {
+  return v >= 0xDC00 && v <= 0xDFFF;
 }
 
 StarBase::StarBase(bool ignore_case) : tree_(ignore_case) {}
@@ -58,7 +58,7 @@ void StarBase::StarPartialBuffer(StarStatistics& statistics, skchar_t* buffer,
   }
 
 #ifdef SKC_USE_UTF16
-  if (left_border > 0 && IsUtf16Surrogate(buffer[start_index + left_border])) {
+  if (left_border > 0 && IsUtf16LowSurrogate(buffer[start_index + left_border])) {
     left_border += 1;
   }
 #endif
@@ -69,7 +69,7 @@ void StarBase::StarPartialBuffer(StarStatistics& statistics, skchar_t* buffer,
   }
 
 #ifdef SKC_USE_UTF16
-  if (right_border > 0 && IsUtf16Surrogate(buffer[stop_index - right_border])) {
+  if (right_border > 0 && IsUtf16LowSurrogate(buffer[stop_index - right_border])) {
     right_border += 1;
   }
 #endif

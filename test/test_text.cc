@@ -122,6 +122,28 @@ void test_process_utf16_4bytes_after_fasle01() {
   MY_ASSERT_ON(source.compare(target) == 0);
 }
 
+void test_process_utf16_4bytes_before_fasle20() {
+  StarTextOptions options{false, 2, 0};
+  StarText engine(options);
+  setupNormalEngine(engine);
+
+  std::u16string source(u"𝄞𝄞𝄞𝄞𝄞 after");
+  std::u16string target(u"𝄞******** after");
+  engine.ProcessBuffer((skchar_t*)source.data(), source.size());
+  MY_ASSERT_ON(source.compare(target) == 0);
+}
+
+void test_process_utf16_4bytes_after_fasle02() {
+  StarTextOptions options{false, 0, 2};
+  StarText engine(options);
+  setupNormalEngine(engine);
+
+  std::u16string source(u"before 𝄞𝄞𝄞𝄞𝄞");
+  std::u16string target(u"before ********𝄞");
+  engine.ProcessBuffer((skchar_t*)source.data(), source.size());
+  MY_ASSERT_ON(source.compare(target) == 0);
+}
+
 void test_skip_length_sample() {
   StarTextOptions options{false, 0, 0};
   StarText engine(options);
@@ -178,6 +200,8 @@ int main(int argc, char* argv[]) {
   test_process_utf16_4bytes_middle_fasle00();
   test_process_utf16_4bytes_before_fasle10();
   test_process_utf16_4bytes_after_fasle01();
+  test_process_utf16_4bytes_before_fasle20();
+  test_process_utf16_4bytes_after_fasle02();
 
   test_skip_length_sample();
   test_skip_length_complex();
